@@ -10,7 +10,7 @@
       <el-col>
         <el-row>
           <div style="position: relative;display: flex;justify-content: center;align-items: center">
-            <input class="input-rounded" readonly type="text" value="检索"
+            <input class="input-rounded" disabled type="text" value="检索"
                    style="width: 130px;height: 30px">
             <img src="/search_icon.png" style="width: 22px;height: 22px;position: absolute;left: 10px">
             <img src="/document.png" style="width: 22px;height: 22px;position: absolute;right: 10px">
@@ -41,23 +41,14 @@
     </el-menu-item>
   </el-menu>
 
-<!--  <div class="full-faker" v-show="isShowFaker">-->
-<!--      <div>fdfdf</div>-->
-<!--  </div>-->
+  <!--  <div class="full-faker" v-show="isShowFaker">-->
+  <!--      <div>fdfdf</div>-->
+  <!--  </div>-->
 
-  <el-dialog v-model="isShowFaker" title="检索" width="30%" center>
-
+  <el-dialog v-model="isShowFaker" title="检索" width="50%" center>
     <div style="padding: 20px 20px 20px 20px">
       <SearchBar/>
     </div>
-    <template #footer>
-      <span class="dialog-footer">
-        <el-button @click="isShowFaker = false">Cancel</el-button>
-        <el-button type="primary" @click="isShowFaker = false"
-        >Confirm</el-button
-        >
-      </span>
-    </template>
   </el-dialog>
 
 
@@ -80,7 +71,6 @@ watchEffect(
 )
 
 const searchHandle = () => {
-  console.log(22222)
   isShowFaker.value = !isShowFaker.value
 }
 
