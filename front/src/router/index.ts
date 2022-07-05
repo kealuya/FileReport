@@ -9,7 +9,7 @@ export const constantRoutes: Array<RouteRecordRaw> = [
         children: [
             {
                 path: '/home',
-                component: () => import('@/components/HelloWorld.vue'),
+                component: () => import('@/components/MainPage.vue'),
                 name: 'Home',
 
             },

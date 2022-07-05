@@ -1,0 +1,161 @@
+<template>
+
+
+  <div style="margin: 15px 0px 15px 0px">
+    <StateCard/>
+  </div>
+
+  <div class="project">
+    <template v-for="  item in projectList ">
+      <el-card style="margin: 10px" :body-style="{ padding: '20px',width:'200px'  }" shadow="hover">
+        <img style="width: 100%"
+             src="https://yyk-app.obs.cn-north-4.myhuaweicloud.com/yyk_szht1949_1653543339403024.jpg"
+
+        />
+        <div style="padding: 14px">
+          <span style="font-size: 24px">{{ item.projectName }}</span>
+          <div class="bottom">
+            <div style="font-size: 12px;color: gray;">
+              {{ item.updateDate }}
+            </div>
+          </div>
+        </div>
+      </el-card>
+    </template>
+  </div>
+  <div class="table">
+    <div style="flex:1;">
+      <h3>状态一览</h3>
+      <el-table :data="projectNewStateData" style="width: 100%">
+        <el-table-column prop="fileName" label="文档"/>
+        <el-table-column prop="updateContent" label="更新"/>
+        <el-table-column prop="updateDate" label="时间"/>
+        <el-table-column prop="fileVersion" label="版本"/>
+      </el-table>
+    </div>
+
+    <div style="width: 20px"></div>
+    <div style="flex:1;">
+      <h3>活跃度一览</h3>
+      <el-table :data="projectActiveData" style=" width: 100%">
+        <el-table-column prop="projectName" label="项目名称"/>
+        <el-table-column prop="releaseCount" label="发布总数"/>
+        <el-table-column prop="fileCount" label="文档总数"/>
+      </el-table>
+    </div>
+  </div>
+  <div style="height: 150px"></div>
+
+</template>
+
+
+<script setup lang="ts">
+import {reactive, ref} from "vue";
+import {ElMessage} from 'element-plus'
+
+defineProps<{ msg: string }>();
+
+const count = ref(0);
+const input = ref("element-plus");
+
+const curDate = ref('')
+
+const toast = () => {
+  ElMessage.success('Hello')
+}
+
+
+const projectList = reactive<Array<{ projectName: string, projectIcon: string, updateDate: string }>>([
+  {projectName: "差旅", projectIcon: "", updateDate: "2022-06-12 13:02:12"},
+  {projectName: "采购", projectIcon: "", updateDate: "2022-06-12"},
+  {projectName: "物流", projectIcon: "", updateDate: "2022-06-12"},
+  {projectName: "资产", projectIcon: "", updateDate: "2022-06-12"},
+  {projectName: "网约车", projectIcon: "", updateDate: "2022-06-12"},
+  {projectName: "业财融合", projectIcon: "", updateDate: "2022-06-12"},
+  {projectName: "医疗", projectIcon: "", updateDate: "2022-06-12"},
+  {projectName: "代码规约类", projectIcon: "", updateDate: "2022-06-12"},
+  {projectName: "公司管理类", projectIcon: "", updateDate: "2022-06-12"},
+  {projectName: "技能提升类", projectIcon: "", updateDate: "2022-06-12"},
+])
+
+
+const projectNewStateData = reactive<Array<{ updateContent: string, fileName: string, updateDate: string, fileVersion: string, }>>(
+    [
+      {
+        updateContent: "追加资产接口",
+        fileName: "浩天业财融合结算平台接口文档-v17(2)(1).docx",
+        updateDate: "2022-06-22 13:31:12",
+        fileVersion: "v1.42"
+      },
+      {
+        updateContent: "追加资产接口",
+        fileName: "浩天业财融合结算平台接口文档-v17(2)(1).docx",
+        updateDate: "2022-06-22 13:31:12",
+        fileVersion: "v1.42"
+      },
+      {
+        updateContent: "追加资产接口",
+        fileName: "浩天业财融合结算平台接口文档-v17(2)(1).docx",
+        updateDate: "2022-06-22 13:31:12",
+        fileVersion: "v1.42"
+      },
+      {
+        updateContent: "追加资产接口",
+        fileName: "浩天业财融合结算平台接口文档-v17(2)(1).docx",
+        updateDate: "2022-06-22 13:31:12",
+        fileVersion: "v1.42"
+      },
+      {
+        updateContent: "追加资产接口",
+        fileName: "浩天业财融合结算平台接口文档-v17(2)(1).docx",
+        updateDate: "2022-06-22 13:31:12",
+        fileVersion: "v1.42"
+      },
+    ]
+)
+
+
+const projectActiveData = reactive<Array<{ projectName: string, releaseCount: string, fileCount: string }>>(
+    [
+      {
+        projectName: "差旅",
+        releaseCount: "1243",
+        fileCount: "103",
+      },
+      {
+        projectName: "采购",
+        releaseCount: "534",
+        fileCount: "39",
+      },
+      {
+        projectName: "业财融合",
+        releaseCount: "55",
+        fileCount: "93",
+      },
+      {
+        projectName: "物流",
+        releaseCount: "34",
+        fileCount: "13",
+      },
+    ]
+)
+
+
+</script>
+
+
+<style>
+.project {
+  margin: 15px 0px 15px 0px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  flex-flow: wrap;
+}
+
+.table {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+</style>
