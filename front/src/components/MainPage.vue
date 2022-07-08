@@ -7,7 +7,7 @@
 
   <div class="project">
     <template v-for="  item in projectList ">
-      <el-card style="margin: 10px" :body-style="{ padding: '20px',width:'200px'  }" shadow="hover">
+      <el-card style="margin: 10px" :body-style="{ padding: '20px',width:'200px'  }" shadow="hover" @click="gotoDetail">
         <img style="width: 100%"
              src="https://yyk-app.obs.cn-north-4.myhuaweicloud.com/yyk_szht1949_1653543339403024.jpg"
 
@@ -24,9 +24,9 @@
     </template>
   </div>
   <div class="table">
-    <div style="flex:1;">
+    <div style="flex:10;">
       <h3>状态一览</h3>
-      <el-table :data="projectNewStateData" style="width: 100%">
+      <el-table :data="projectNewStateData" size="large" style="width: 100%;height: 100%">
         <el-table-column prop="fileName" label="文档"/>
         <el-table-column prop="updateContent" label="更新"/>
         <el-table-column prop="updateDate" label="时间"/>
@@ -34,10 +34,10 @@
       </el-table>
     </div>
 
-    <div style="width: 20px"></div>
-    <div style="flex:1;">
+    <div style="flex:1; "></div>
+    <div style="flex:10;">
       <h3>活跃度一览</h3>
-      <el-table :data="projectActiveData" style=" width: 100%">
+      <el-table :data="projectActiveData" size="large" style=" width: 100%;height: 100%">
         <el-table-column prop="projectName" label="项目名称"/>
         <el-table-column prop="releaseCount" label="发布总数"/>
         <el-table-column prop="fileCount" label="文档总数"/>
@@ -52,6 +52,7 @@
 <script setup lang="ts">
 import {reactive, ref} from "vue";
 import {ElMessage} from 'element-plus'
+import {useRouter} from "vue-router";
 
 defineProps<{ msg: string }>();
 
@@ -64,6 +65,11 @@ const toast = () => {
   ElMessage.success('Hello')
 }
 
+const router = useRouter()
+
+const gotoDetail = () => {
+  router.push("/detail")
+}
 
 const projectList = reactive<Array<{ projectName: string, projectIcon: string, updateDate: string }>>([
   {projectName: "差旅", projectIcon: "", updateDate: "2022-06-12 13:02:12"},
@@ -81,6 +87,24 @@ const projectList = reactive<Array<{ projectName: string, projectIcon: string, u
 
 const projectNewStateData = reactive<Array<{ updateContent: string, fileName: string, updateDate: string, fileVersion: string, }>>(
     [
+      {
+        updateContent: "追加资产接口",
+        fileName: "浩天业财融合结算平台接口文档-v17(2)(1).docx",
+        updateDate: "2022-06-22 13:31:12",
+        fileVersion: "v1.42"
+      },
+      {
+        updateContent: "追加资产接口",
+        fileName: "浩天业财融合结算平台接口文档-v17(2)(1).docx",
+        updateDate: "2022-06-22 13:31:12",
+        fileVersion: "v1.42"
+      },
+      {
+        updateContent: "追加资产接口",
+        fileName: "浩天业财融合结算平台接口文档-v17(2)(1).docx",
+        updateDate: "2022-06-22 13:31:12",
+        fileVersion: "v1.42"
+      },
       {
         updateContent: "追加资产接口",
         fileName: "浩天业财融合结算平台接口文档-v17(2)(1).docx",
@@ -134,6 +158,26 @@ const projectActiveData = reactive<Array<{ projectName: string, releaseCount: st
       },
       {
         projectName: "物流",
+        releaseCount: "34",
+        fileCount: "13",
+      },
+      {
+        projectName: "资产",
+        releaseCount: "34",
+        fileCount: "13",
+      },
+      {
+        projectName: "医疗",
+        releaseCount: "34",
+        fileCount: "13",
+      },
+      {
+        projectName: "网约车",
+        releaseCount: "34",
+        fileCount: "13",
+      },
+      {
+        projectName: "公司管理类",
         releaseCount: "34",
         fileCount: "13",
       },

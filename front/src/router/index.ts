@@ -13,6 +13,12 @@ export const constantRoutes: Array<RouteRecordRaw> = [
                 name: 'Home',
 
             },
+            {
+                path: '/detail',
+                component: () => import('@/components/ProjectDetail.vue'),
+                name: 'Detail',
+
+            },
 
         ]
     }
