@@ -1,17 +1,23 @@
 <template>
   <div style="padding: 20px">
 
-    <el-card class="box-card">
-
-      <div style="width: 100%;display: flex;justify-content: start;align-items: center">
+    <el-card style="width: 100%;  ">
+      <div style="display: flex;flex-direction: row;justify-content: start;align-items: center">
         <div style="font-size: 18px">近期更新</div>
       </div>
-      <el-table :data="headerData" style="width: 50%">
-        <el-table-column prop="name" label="名称" width="480"/>
-        <el-table-column prop="updateDate" label="更新时间" width="180"/>
-        <el-table-column prop="updateUser" label="更新人"/>
-      </el-table>
-
+      <div style="display: flex;flex-direction: row;align-items: center;justify-content: space-between">
+        <div style="  flex: 1">
+          <el-table :data="headerData">
+            <el-table-column prop="name" label="名称" width="480"/>
+            <el-table-column prop="updateDate" label="更新时间" width="180"/>
+            <el-table-column prop="updateUser" label="更新人"/>
+          </el-table>
+        </div>
+        <div style="flex: 1">
+          <el-image fit="none" class="imageShow"
+                    src="/folder/background-image-files1.jpg"/>
+        </div>
+      </div>
     </el-card>
 
     <div style="height: 20px"></div>
@@ -48,6 +54,11 @@
         <template #default="scope">
           <div style="display: flex; align-items: center">
             <span style="margin-left: 10px">{{ scope.row.version }}</span>
+            <template v-if="scope.row.isRelease===false">
+              <div class="release">
+                发布
+              </div>
+            </template>
           </div>
         </template>
       </el-table-column>
@@ -144,7 +155,7 @@ for (let i = 0; i < 15; i++) {
     createDate: '2017-08-03 12:32:51',
     updateUser: '边宇辰',
     version: 'v1.22',
-    fileType: 'word',
+    fileType: "111",
     isRelease: false
   })
 }
@@ -180,6 +191,25 @@ for (let i = 0; i < 3; i++) {
   box-shadow: 2px 2px 3px #b4b3b3;
   padding: 0px 20px 0px 20px;
   border: 1px solid #e3e2e2;
+}
+
+.release {
+  width: 32px;
+  height: 24px;
+  background-color: var(--ep-color-primary);
+  color: white;
+  border-radius: 4px;
+  text-align: center;
+  font-size: 12px;
+  margin-left: 4px;
+}
+
+.imageShow {
+  padding-left: 20px;
+  height: 200px;
+  width: 98%;
+  border-radius: 8px;
+  filter: blur(4px);
 }
 
 
