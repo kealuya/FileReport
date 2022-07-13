@@ -46,6 +46,14 @@ func (c *MainController) GetView() {
 	c.Data["json"] = &test
 	c.ServeJSON()
 }
+
+func (c *MainController) GetProductHeader() {
+	result, err := models.GetProductHeader()
+	if err == nil {
+		c.Data["json"] = result
+	}
+	c.ServeJSON()
+}
 func (c *MainController) UploadFile() {
 	resJson := NewJsonStruct(nil)
 	defer func() {

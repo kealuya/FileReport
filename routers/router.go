@@ -10,6 +10,8 @@ func init() {
 	beego.Router("/log/getlog", &controllers.MainController{}, "get:GetLog")
 	beego.Router("/log/getview", &controllers.MainController{}, "get:GetView")
 	beego.Router("/log/uploadFile", &controllers.MainController{}, "post:UploadFile")
+	beego.Router("/log/getProductHeader", &controllers.MainController{}, "post:GetProductHeader")
+
 	/*namespace :=
 		beego.NewNamespace("/v1",
 			beego.NSNamespace("/test",

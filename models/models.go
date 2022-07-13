@@ -30,6 +30,15 @@ func TestView() ([]entity.ProductStatus, error) {
 	return productInfo, err
 
 }
+func GetProductHeader() ([]entity.ProductInfo, error) {
+	o := orm.NewOrm()
+	var productlist []entity.ProductInfo
+	productnums, err := o.Raw("SELECT * FROM product_info ").QueryRows(&productlist)
+	if err != nil || productnums < 1 {
+		return productlist, err
+	}
+	return productlist, nil
+}
 func Upload(filename, productname, ismajor, creater string) (string, error) {
 	o := orm.NewOrm()
 	/*	id, err := o.Insert(file)
