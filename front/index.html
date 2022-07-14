@@ -1,18 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8"/>
+    <link rel="icon" href="/favicon.svg"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Element Plus Vite Starter</title>
     <!-- element css cdn, if you use custom theme, remove it. -->
     <!-- <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/element-plus/dist/index.css"
     /> -->
-  </head>
-  <body>
-    <div id="app"></div>
-    <script type="module" src="/src/main.ts"></script>
-  </body>
+</head>
+<body>
+<div id="app"></div>
+<script type="module" src="/src/main.ts"></script>
+<script src="/esdk-obs-browserjs-without-polyfill-3.19.5.min.js"></script>
+</body>
+
+<script type="text/javascript">
+    // 利用index.html引入js组件
+    window.document.getObsClient = (ak, sk, server) => {
+        let obsClient = new ObsClient({
+            access_key_id: ak,
+            secret_access_key: sk,
+            server: server,
+            timeout: 60 * 5,
+        });
+        return obsClient;
+    };
+</script>
+
 </html>

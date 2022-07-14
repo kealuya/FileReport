@@ -42,7 +42,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="名称" sortable min-width="480">
+      <el-table-column label="名称" sortable min-width="400">
         <template #default="scope">
           <div style="display: flex; align-items: center">
             <span style="margin-left: 10px">{{ scope.row.name }}</span>
@@ -94,10 +94,10 @@
               <div
                   style="display: flex;flex-direction: column;justify-content: space-around;align-items: center;height: 140px">
                 <div>
-                  <el-button @click="release" size="small" type="primary">发布</el-button>
+                  <el-button size="small" type="primary" @click="release">发布</el-button>
                 </div>
                 <div>
-                  <el-button size="small" type="primary">更新</el-button>
+                  <el-button size="small" type="primary" @click="fileUpdate">更新</el-button>
                 </div>
                 <div>
                   <el-button size="small" type="primary">废弃</el-button>
@@ -120,6 +120,7 @@
     <div style="height: 20px"></div>
     <el-pagination background layout="prev, pager, next" :total="1000"/>
   </div>
+  <UploadModal @updatedCallBack="updatedCallBack" @closeCallBack="closeCallBack" :is-show="dialogVisible"></UploadModal>
 </template>
 
 <script lang="ts" setup>
@@ -141,8 +142,18 @@ interface File {
 
 const searchContent = ref('')
 
+const updatedCallBack = () => {
+  console.log("上传成功")
+  dialogVisible.value = false
+//todo 更新页面
+}
+const closeCallBack = () => {
+  dialogVisible.value = false
+}
+
 const release = () => {
-  console.log(isDark.value)
+
+
 }
 
 const tableData: File[] = reactive(
@@ -174,6 +185,11 @@ for (let i = 0; i < 3; i++) {
     fileType: 'word',
     isRelease: false
   })
+}
+
+const dialogVisible = ref(false)
+const fileUpdate = () => {
+  dialogVisible.value = true
 }
 
 

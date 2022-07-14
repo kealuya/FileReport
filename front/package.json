@@ -10,13 +10,15 @@
     "typecheck": "vue-tsc --noEmit"
   },
   "dependencies": {
-    "@vueuse/core": "^8.2.0",
     "@element-plus/icons": "^0.0.11",
+    "@vueuse/core": "^8.2.0",
     "countup.js": "^2.2.0",
     "element-plus": "^2.2.2",
+    "huawei-obs-sdk": "^3.21.6",
     "vue": "^3.2.36",
     "vue-countup-v2": "^4.0.0",
-    "vue-router": "4"
+    "vue-router": "4",
+    "xml2js": "^0.4.23"
   },
   "devDependencies": {
     "@iconify-json/ep": "^1.1.4",

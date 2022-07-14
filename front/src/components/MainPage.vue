@@ -6,7 +6,7 @@
   </div>
 
   <div class="project">
-    <template v-for="  item in projectList ">
+    <template v-for="item in projectList">
       <el-card style="margin: 10px" :body-style="{ padding: '20px',width:'200px'  }" shadow="hover" @click="gotoDetail">
         <img style="width: 100%"
              src="https://yyk-app.obs.cn-north-4.myhuaweicloud.com/yyk_szht1949_1653543339403024.jpg"

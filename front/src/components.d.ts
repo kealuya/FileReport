@@ -25,6 +25,7 @@ declare module '@vue/runtime-core' {
     ElSubMenu: typeof import('element-plus/es')['ElSubMenu']
     ElTable: typeof import('element-plus/es')['ElTable']
     ElTableColumn: typeof import('element-plus/es')['ElTableColumn']
+    ElUpload: typeof import('element-plus/es')['ElUpload']
     Loading: typeof import('element-plus/es')['ElLoadingDirective']
     Main: typeof import('./components/layouts/Main.vue')['default']
     MainPage: typeof import('./components/MainPage.vue')['default']
@@ -34,6 +35,7 @@ declare module '@vue/runtime-core' {
     RouterView: typeof import('vue-router')['RouterView']
     SearchBar: typeof import('./components/SearchBar.vue')['default']
     StateCard: typeof import('./components/StateCard.vue')['default']
+    UploadModal: typeof import('./components/UploadModal.vue')['default']
   }
 }
 

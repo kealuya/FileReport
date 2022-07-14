@@ -10,11 +10,28 @@
     "sourceMap": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,
-    "lib": ["esnext", "dom"],
+    "lib": [
+      "esnext",
+      "dom"
+    ],
     "paths": {
-      "~/*": ["src/*"]
+      "~/*": [
+        "src/*"
+      ]
     },
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    //vue3+ts引入js
+//    "allowJs": true,
+    //允许引入没有默认导出的模块
+//    "allowSyntheticDefaultImports": true,
+//    "noImplicitAny": false
   },
-  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue"]
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.d.ts",
+    "src/**/*.tsx",
+    "src/**/*.vue",
+    //vue3+ts引入js
+//    "src/**/*.js"
+  ]
 }
