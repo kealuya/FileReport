@@ -24,3 +24,14 @@ type ProductInfo struct {
 	LastUpdateTime string
 	LastCreater    string
 }
+type UserInfo struct {
+	Id         int64
+	Userid     string `orm:"unique"`
+	Password   string
+	Username   string
+	UserRole   string
+	CreateTime string `orm:"null"`
+	Creater    string `orm:"null"`
+	ModifyTime string `orm:"null"`
+	Modifier   string `orm:"null"`
+}

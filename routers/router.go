@@ -11,6 +11,8 @@ func init() {
 	beego.Router("/log/getview", &controllers.MainController{}, "get:GetView")
 	beego.Router("/log/uploadFile", &controllers.MainController{}, "post:UploadFile")
 	beego.Router("/log/getProductHeader", &controllers.MainController{}, "post:GetProductHeader")
+	beego.Router("/user/login", &controllers.UserController{}, "post:Login")
+	beego.Router("/user/addPeople", &controllers.UserController{}, "post:AddPeople")
 
 	/*namespace :=
 		beego.NewNamespace("/v1",
