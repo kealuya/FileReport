@@ -25,10 +25,14 @@
 
         <template #tip>
           <div class="el-upload__tip">
-            上传的文件会自动更新版本，并维持既存文件名称
+            上传的文件会自动版本+0.01，并维持既存文件名称
           </div>
         </template>
       </el-upload>
+      <div style="display: flex;align-items: center;justify-content: start">
+        <div  >手动版本调整：</div>
+        <el-input v-model="motoVersion" size="small" style=";width: 50px" maxlength="5"/>
+      </div>
       <template #footer>
       <span class="dialog-footer">
         <el-button @click="handleClose">关闭</el-button>
@@ -40,7 +44,6 @@
 
 <script lang="ts" setup>
 import {reactive, ref, toRef, toRefs, watchEffect} from "vue";
-import {Search} from "@element-plus/icons-vue"
 import {ElMessage, genFileId, UploadInstance, UploadProps, UploadRawFile, UploadRequestOptions} from "element-plus";
 
 
@@ -115,6 +118,9 @@ const httpRequest = (options: UploadRequestOptions) => {
     }
   });
 }
+
+const motoVersion = ref('v1.34')
+
 </script>
 
 <style>

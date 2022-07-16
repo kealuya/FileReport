@@ -51,10 +51,8 @@
 
 <script setup lang="ts">
 import {reactive, ref} from "vue";
-import {ElMessage} from 'element-plus'
+import {ElMessage, ElLoading} from 'element-plus'
 import {useRouter} from "vue-router";
-
-defineProps<{ msg: string }>();
 
 const count = ref(0);
 const input = ref("element-plus");
@@ -68,6 +66,7 @@ const toast = () => {
 const router = useRouter()
 
 const gotoDetail = () => {
+  ElLoading.service({fullscreen: true})
   router.push("/detail")
 }
 

@@ -87,33 +87,24 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="操作" sortable min-width="100">
+      <el-table-column label="操作" min-width="100">
         <template #default="scope">
-          <el-popover trigger="click" placement="right">
-            <div style="width: 100%;height: 100%;">
-              <div
-                  style="display: flex;flex-direction: column;justify-content: space-around;align-items: center;height: 140px">
-                <div>
-                  <el-button size="small" type="primary" @click="release">发布</el-button>
-                </div>
-                <div>
-                  <el-button size="small" type="primary" @click="fileUpdate">更新</el-button>
-                </div>
-                <div>
-                  <el-button size="small" type="primary">废弃</el-button>
-                </div>
-                <div>
-                  <el-button size="small" type="primary">版本</el-button>
-                </div>
-
-              </div>
-            </div>
-            <template #reference>
-              <div>
-                <el-button style="width: 40px">操作</el-button>
-              </div>
+          <el-dropdown>
+            <el-button size="small" type="primary">
+              操作
+              <el-icon class="el-icon--right">
+                <arrow-down/>
+              </el-icon>
+            </el-button>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item @click="fileUpdate">更新上传</el-dropdown-item>
+                <el-dropdown-item @click="release">权限调整</el-dropdown-item>
+                <el-dropdown-item>废弃文件</el-dropdown-item>
+                <el-dropdown-item>版本管理</el-dropdown-item>
+              </el-dropdown-menu>
             </template>
-          </el-popover>
+          </el-dropdown>
         </template>
       </el-table-column>
     </el-table>
@@ -125,9 +116,11 @@
 
 <script lang="ts" setup>
 
-import {reactive, ref} from "vue";
+import {onMounted, reactive, ref} from "vue";
 import {isDark} from "~/composables";
-import {Search} from "@element-plus/icons-vue"
+// @ts-ignore
+import {Search, ArrowDown} from "@element-plus/icons-vue"
+import {ElLoading} from "element-plus/es";
 
 interface File {
   updateDate: string
@@ -139,6 +132,12 @@ interface File {
   fileType: string
   isRelease: false
 }
+
+onMounted(() => {
+  const loadingInstance = ElLoading.service({fullscreen: true})
+  loadingInstance.close()
+})
+
 
 const searchContent = ref('')
 
