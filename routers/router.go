@@ -9,8 +9,10 @@ func init() {
 	beego.Router("/", &controllers.MainController{})
 	beego.Router("/log/getlog", &controllers.MainController{}, "get:GetLog")
 	beego.Router("/log/getview", &controllers.MainController{}, "get:GetView")
-	beego.Router("/log/uploadFile", &controllers.MainController{}, "post:UploadFile")
-
+	beego.Router("/file/uploadFile", &controllers.FlieController{}, "post:UploadFile")
+	beego.Router("/file/updateFile", &controllers.FlieController{}, "post:UpdateFile")
+	beego.Router("/file/publish", &controllers.FlieController{}, "post:PublishFile")
+	beego.Router("/file/abolish", &controllers.FlieController{}, "post:AbolishFile")
 	beego.Router("/file/getProductHeader", &controllers.FlieController{}, "post:GetProductHeader")
 	beego.Router("/file/getRecentUpdate", &controllers.FlieController{}, "post:GetRecentUpdate")
 	beego.Router("/user/login", &controllers.UserController{}, "post:Login")

@@ -3,8 +3,9 @@ package controllers
 type FileInfo struct {
 	FlieName    string `json:"flieName"`
 	MajorUpdate string `json:"majorUpdate"`
+	Version     string `json:"version"`
 	ProductName string `json:"productName"`
-	Creater     string `json:"creater"`
+	Userid      string `json:"userid"`
 }
 type UserInfo struct {
 	Userid   string `json:"userid"`

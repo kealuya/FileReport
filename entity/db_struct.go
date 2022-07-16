@@ -1,11 +1,27 @@
 package entity
 
+type FileRecord struct {
+	Id            int64
+	FileName      string
+	MajorVersion  int64
+	MinorVersion  int64
+	AbolishFlag   string
+	PublishFlag   string
+	ProductName   string
+	Operationtype string
+	CreateTime    string `orm:"null"`
+	Creater       string `orm:"null"`
+	ModifyTime    string `orm:"null"`
+	Modifier      string `orm:"null"`
+}
 type FileInfo struct {
-	Id           int64 `orm:"null"`
+	Id           int64
 	FileName     string
-	MajorVersion int8   `orm:"null"`
-	MinorVersion int8   `orm:"null"`
-	ProductName  string `orm:"null"`
+	MajorVersion int64
+	MinorVersion int64
+	ProductName  string
+	AbolishFlag  string
+	PublishFlag  string
 	CreateTime   string `orm:"null"`
 	Creater      string `orm:"null"`
 	ModifyTime   string `orm:"null"`
