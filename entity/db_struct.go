@@ -5,9 +5,9 @@ type FileRecord struct {
 	FileName      string
 	MajorVersion  int64
 	MinorVersion  int64
-	AbolishFlag   string
-	PublishFlag   string
 	ProductName   string
+	AbolishFlag   string `orm:"null;default(0)"`
+	PublishFlag   string `orm:"null;default(0)"`
 	Operationtype string
 	CreateTime    string `orm:"null"`
 	Creater       string `orm:"null"`
@@ -20,8 +20,8 @@ type FileInfo struct {
 	MajorVersion int64
 	MinorVersion int64
 	ProductName  string
-	AbolishFlag  string
-	PublishFlag  string
+	AbolishFlag  string `orm:"null;default(0)"`
+	PublishFlag  string `orm:"null;default(0)"`
 	CreateTime   string `orm:"null"`
 	Creater      string `orm:"null"`
 	ModifyTime   string `orm:"null"`

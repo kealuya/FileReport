@@ -19,10 +19,25 @@ func (fCtrl *FlieController) GetProductHeader() {
 		fCtrl.ServeJSON()
 
 	}()
-	result, err := models.GetProductHeader()
-	if err != nil {
+	result := models.GetProductHeader()
+	if !result.Success {
 		resJson.Success = false
-		resJson.Msg = fmt.Sprintf("获取项目状态Header失败 : %s", err.Error())
+		resJson.Msg = fmt.Sprintf("获取项目状态Header失败 : %s", result.Msg)
+		return
+	}
+	resJson.Data = result
+}
+func (fCtrl *FlieController) GetHeader() {
+	resJson := NewJsonStruct(nil)
+	defer func() {
+		fCtrl.Data["json"] = string(common.Marshal(resJson))
+		fCtrl.ServeJSON()
+
+	}()
+	result := models.GetHeader()
+	if !result.Success {
+		resJson.Success = false
+		resJson.Msg = fmt.Sprintf("获取项当前状态Header失败 : %s", result.Msg)
 		return
 	}
 	resJson.Data = result
@@ -35,11 +50,10 @@ func (fCtrl *FlieController) GetRecentUpdate() {
 
 	}()
 
-	filelist, err := models.GetRecentUpdate()
-	//c.Ctx.WriteString("看到我，就说明你这玩意调成功了\nsdasdsad\n")
-	if err != nil {
+	filelist := models.GetRecentUpdate()
+	if !filelist.Success {
 		resJson.Success = false
-		resJson.Msg = fmt.Sprintf("获取最近更新文档失败 : %s", err.Error())
+		resJson.Msg = fmt.Sprintf("获取最近更新文档失败 : %s", filelist.Msg)
 		return
 	}
 	resJson.Data = filelist
@@ -58,24 +72,15 @@ func (fCtrl *FlieController) UploadFile() {
 		resJson.Msg = fmt.Sprintf("系统错误 : %s", err.Error())
 		return
 	}
-	/*
-		file := new(entity.FileInfo)
-		file.FlieName = "差旅演示"
-		file.CreateTime = time.Now().Format("2006-01-02 15:04:05")
-		file.ModifyTime = time.Now().Format("2006-01-02 15:04:05")
-		file.Creater = "zxh"
-		file.Modifier = "zxh"
-		file.MajorVersion = 1
-		file.MinorVersion = 1
-		file.ProductName = "cl"*/
-	result, err := models.Upload(
+
+	result := models.Upload(
 		UploadFileRequestKey.FlieName,
 		UploadFileRequestKey.ProductName,
 		UploadFileRequestKey.MajorUpdate,
 		UploadFileRequestKey.Userid)
-	if err != nil {
+	if !result.Success {
 		resJson.Success = false
-		resJson.Msg = fmt.Sprintf("登录失败失败 : %s", err.Error())
+		resJson.Msg = fmt.Sprintf("上传文档记录失败 : %s", result.Msg)
 		return
 	}
 	resJson.Data = result
@@ -99,9 +104,9 @@ func (fCtrl *FlieController) AbolishFile() {
 		AbolishFileRequestKey.FlieName,
 		AbolishFileRequestKey.ProductName,
 		AbolishFileRequestKey.Userid)
-	if err != nil {
+	if !result.Success {
 		resJson.Success = false
-		resJson.Msg = fmt.Sprintf("登录失败失败 : %s", err.Error())
+		resJson.Msg = fmt.Sprintf("废除文档失败 : %s", result.Msg)
 		return
 	}
 	resJson.Data = result
@@ -125,9 +130,9 @@ func (fCtrl *FlieController) PublishFile() {
 		PublishFileRequestKey.FlieName,
 		PublishFileRequestKey.ProductName,
 		PublishFileRequestKey.Userid)
-	if err != nil {
+	if !result.Success {
 		resJson.Success = false
-		resJson.Msg = fmt.Sprintf("登录失败失败 : %s", err.Error())
+		resJson.Msg = fmt.Sprintf("发布文档失败 : %s", result.Msg)
 		return
 	}
 	resJson.Data = result
@@ -156,11 +161,26 @@ func (fCtrl *FlieController) UpdateFile() {
 		UpdateFileRequestKey.Userid,
 		major,
 		minor)
-	if err != nil {
+	if !result.Success {
 		resJson.Success = false
-		resJson.Msg = fmt.Sprintf("登录失败失败 : %s", err.Error())
+		resJson.Msg = fmt.Sprintf("登录失败失败 : %s", result.Msg)
 		return
 	}
 	resJson.Data = result
 
+}
+func (fCtrl *FlieController) GetLatestTrend() {
+	resJson := NewJsonStruct(nil)
+	defer func() {
+		fCtrl.Data["json"] = string(common.Marshal(resJson))
+		fCtrl.ServeJSON()
+
+	}()
+	result := models.GetLatestTrend()
+	if !result.Success {
+		resJson.Success = false
+		resJson.Msg = fmt.Sprintf("获取最新动态失败 : %s", result.Msg)
+		return
+	}
+	resJson.Data = result
 }

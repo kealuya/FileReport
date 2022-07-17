@@ -1,8 +1,6 @@
 package controllers
 
 import (
-	"FileReport/models"
-	"github.com/beego/beego/v2/core/logs"
 	beego "github.com/beego/beego/v2/server/web"
 )
 
@@ -32,14 +30,5 @@ func (c *MainController) GetLog() {
 		logs.Info(test)
 		//c.Ctx.WriteString("看到我，就说明你这玩意调成功了\nsdasdsad\n")
 		c.Data["json"] = &test*/
-	c.ServeJSON()
-}
-func (c *MainController) GetView() {
-	str := c.GetString("date")
-	println(str)
-	test, _ := models.TestView()
-	logs.Info(test)
-	//c.Ctx.WriteString("看到我，就说明你这玩意调成功了\nsdasdsad\n")
-	c.Data["json"] = &test
 	c.ServeJSON()
 }

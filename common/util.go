@@ -36,6 +36,14 @@ func RecoverHandler(f func(err error)) {
 	}
 }
 
+//共通错误error处理方法
+func ErrorHandler(err error, info ...interface{}) {
+	if err != nil {
+		logs.Error("★★★错误error::", err, info)
+		//log.Panicln(err)
+	}
+}
+
 //String转Int8
 func StringToInt64(str string) int64 {
 	n, _ := strconv.ParseInt(str, 10, 8)
