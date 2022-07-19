@@ -5,6 +5,7 @@ import (
 	"FileReport/models"
 	"encoding/json"
 	"fmt"
+	"github.com/beego/beego/v2/core/logs"
 	beego "github.com/beego/beego/v2/server/web"
 )
 
@@ -15,26 +16,28 @@ type UserController struct {
 func (uCtrl *UserController) Login() {
 	resJson := NewJsonStruct(nil)
 	defer func() {
-		uCtrl.Data["json"] = string(common.Marshal(resJson))
+		uCtrl.Data["json"] = resJson
 		uCtrl.ServeJSON()
-
 	}()
 
-	var UserInfoRequestKey = new(UserInfo)
+	userInfoRequestKey := UserInfo{}
+
 	res := uCtrl.Ctx.Input.RequestBody
-	err := json.Unmarshal(res, &UserInfoRequestKey)
-	if err != nil {
+	err_Unmarshal := json.Unmarshal(res, &userInfoRequestKey)
+	if err_Unmarshal != nil {
 		resJson.Success = false
-		resJson.Msg = fmt.Sprintf("系统错误 : %s", err.Error())
+		resJson.Msg = fmt.Sprintf("系统错误 : %s", err_Unmarshal.Error())
+		logs.Error(err_Unmarshal)
 		return
 	}
-	userinfo, err := models.Login(
-		UserInfoRequestKey.Userid,
-		UserInfoRequestKey.Password)
+	userinfo, err_Login := models.Login(
+		userInfoRequestKey.Userid,
+		userInfoRequestKey.Password)
 	//c.Ctx.WriteString("看到我，就说明你这玩意调成功了\nsdasdsad\n")
-	if err != nil {
+	if err_Login != nil {
 		resJson.Success = false
-		resJson.Msg = fmt.Sprintf("登录失败失败 : %s", err.Error())
+		resJson.Msg = fmt.Sprintf("登录失败 : %s", err_Login.Error())
+		logs.Error(err_Login)
 		return
 	}
 	resJson.Data = userinfo

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/beego/beego/v2/core/logs"
 	jsoniter "github.com/json-iterator/go"
+	"log"
 	"reflect"
 	"runtime/debug"
 	"strconv"
@@ -40,7 +41,7 @@ func RecoverHandler(f func(err error)) {
 func ErrorHandler(err error, info ...interface{}) {
 	if err != nil {
 		logs.Error("★★★错误error::", err, info)
-		//log.Panicln(err)
+		log.Panicln(err)
 	}
 }
 

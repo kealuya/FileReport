@@ -1,20 +1,26 @@
 package models
 
 import (
+	"FileReport/common"
 	"FileReport/db"
 	"FileReport/entity"
 	"errors"
 	"github.com/beego/beego/v2/client/orm"
 )
 
-func Login(userid, password string) (entity.UserInfo, error) {
-	o := orm.NewOrm()
-	userinfo := entity.UserInfo{}
-	userinfo, err := db.SelectUser(o, userid)
+func Login(userid, password string) (result entity.UserInfo, resultErr error) {
+	defer common.RecoverHandler(func(rcErr error) {
+		result = entity.UserInfo{}
+		resultErr = rcErr
+	})
 
-	if err != nil || userinfo.Userid == "" {
+	userinfo := db.SelectUser(userid)
+
+	if userinfo.Userid == "" {
 		return entity.UserInfo{}, errors.New("不存在该用户")
-	} else if userinfo.Password != password {
+	}
+
+	if userinfo.Password != password {
 		return entity.UserInfo{}, errors.New("密码错误")
 	}
 
@@ -53,11 +59,12 @@ func AddPeople(userid, password, username, userrole string) (entity.UserInfo, er
 		if err1 != nil {
 			to.Rollback()
 			return entity.UserInfo{}, err1
-		} else */if err != nil {
+		} else */
+	if err != nil {
 		to.Rollback()
 	} else {
 		to.Commit()
 	}
-	userinfo, err := db.SelectUser(o, userid)
-	return userinfo, err
+	userinfo := db.SelectUser(userid)
+	return userinfo, nil
 }
