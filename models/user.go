@@ -6,6 +6,7 @@ import (
 	"FileReport/entity"
 	"errors"
 	"github.com/beego/beego/v2/client/orm"
+	"time"
 )
 
 func Login(userid, password string) (result entity.UserInfo, resultErr error) {
@@ -26,9 +27,9 @@ func Login(userid, password string) (result entity.UserInfo, resultErr error) {
 
 	return userinfo, nil
 }
-func AddPeople(userid, password, username, userrole string) (entity.UserInfo, error) {
+func AddPeople(userid, password, userrole, username string) (result entity.UserInfo, resultErr error) {
 	o := orm.NewOrm()
-	//不好用
+	//另一种处理事务的方法
 	/*	err := o.DoTx(func(ctx context.Context, txOrm orm.TxOrmer) error {
 		// data
 		user := entity.UserInfo{}
@@ -45,26 +46,45 @@ func AddPeople(userid, password, username, userrole string) (entity.UserInfo, er
 		return e
 	})*/
 	to, err := o.Begin()
+	defer common.RecoverHandler(func(rcErr error) {
+		to.Rollback()
+		result = entity.UserInfo{}
+		resultErr = rcErr
+	})
+	if err != nil {
+		panic("****AddPeople****start the transaction failed")
+	}
 	user := entity.UserInfo{}
 	user.Userid = userid
 	user.Password = password
 	user.UserRole = userrole
 	user.Username = username
 
-	err = db.AddUser(to, user)
-	//另一个写库操作，待补充
-	/*	user1 := user
-			user1.Userid = "dsad"
-		err1 := db.AddUser(to, user1)
-		if err1 != nil {
-			to.Rollback()
-			return entity.UserInfo{}, err1
-		} else */
-	if err != nil {
-		to.Rollback()
-	} else {
-		to.Commit()
-	}
+	_ = db.AddUser(to, user)
+	_ = to.Commit()
 	userinfo := db.SelectUser(userid)
 	return userinfo, nil
+}
+func EditPeople(userid, password, username, userrole, modifier string) (result string, resultErr error) {
+	o := orm.NewOrm()
+	to, err := o.Begin()
+	defer common.RecoverHandler(func(rcErr error) {
+		to.Rollback()
+		result = "fail"
+		resultErr = rcErr
+	})
+	if err != nil {
+		panic("****EditPeople****start the transaction failed")
+	}
+	user := entity.UserInfo{}
+	user.Userid = userid
+	user.Password = password
+	user.UserRole = userrole
+	user.Username = username
+	user.Modifier = modifier
+	user.ModifyTime = time.Now().Format("2006-01-02 15:04:05")
+	_ = db.UpdateUser(to, user)
+
+	_ = to.Commit()
+	return "success", nil
 }

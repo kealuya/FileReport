@@ -16,9 +16,10 @@ func init() {
 	beego.Router("/file/getProductHeader", &controllers.FlieController{}, "post:GetProductHeader")
 	beego.Router("/file/getRecentUpdate", &controllers.FlieController{}, "post:GetRecentUpdate")
 	beego.Router("/file/getLatestTrend", &controllers.FlieController{}, "post:GetLatestTrend")
+	beego.Router("/file/getActiveProduct", &controllers.FlieController{}, "post:GetActiveProduct")
 	beego.Router("/user/login", &controllers.UserController{}, "post:Login")
 	beego.Router("/user/addPeople", &controllers.UserController{}, "post:AddPeople")
-
+	beego.Router("/user/editPeople", &controllers.UserController{}, "post:EditPeople")
 	/*namespace :=
 		beego.NewNamespace("/v1",
 			beego.NSNamespace("/test",

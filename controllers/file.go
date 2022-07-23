@@ -197,3 +197,13 @@ func (fCtrl *FlieController) GetLatestTrend() {
 	}
 	resJson.Data = result
 }
+func (fCtrl *FlieController) GetActiveProduct() {
+	resJson := NewJsonStruct(nil)
+	defer func() {
+		fCtrl.Data["json"] = resJson
+		fCtrl.ServeJSON()
+
+	}()
+
+	resJson.Data = "该接口需要明确是要咋处理再实现"
+}
