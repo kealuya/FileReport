@@ -8,7 +8,7 @@ import (
 func init() {
 	beego.Router("/", &controllers.MainController{})
 	beego.Router("/log/getlog", &controllers.MainController{}, "get:GetLog")
-	beego.Router("/file/getHeader", &controllers.FlieController{}, "post:GetHeader")
+	beego.Router("/file/getCurrentHeader", &controllers.FlieController{}, "post:GetCurrentHeader")
 	beego.Router("/file/uploadFile", &controllers.FlieController{}, "post:UploadFile")
 	beego.Router("/file/updateFile", &controllers.FlieController{}, "post:UpdateFile")
 	beego.Router("/file/publishFile", &controllers.FlieController{}, "post:PublishFile")

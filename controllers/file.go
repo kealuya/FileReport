@@ -29,14 +29,14 @@ func (fCtrl *FlieController) GetProductHeader() {
 	}
 	resJson.Data = result
 }
-func (fCtrl *FlieController) GetHeader() {
+func (fCtrl *FlieController) GetCurrentHeader() {
 	resJson := NewJsonStruct(nil)
 	defer func() {
 		fCtrl.Data["json"] = resJson
 		fCtrl.ServeJSON()
 
 	}()
-	result, err_Header := models.GetHeader()
+	result, err_Header := models.GetCurrentHeader()
 	if err_Header != nil {
 		resJson.Success = false
 		resJson.Msg = fmt.Sprintf("获取当前header失败 : %s", err_Header.Error())

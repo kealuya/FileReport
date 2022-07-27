@@ -185,13 +185,13 @@ func Upload(filename, productname, ismajor, userid string) (result string, resul
 	return "success", nil
 
 }
-func GetHeader() (result []entity.ProductStatus, resultErr error) {
+func GetCurrentHeader() (result []entity.ProductStatus, resultErr error) {
 	defer common.RecoverHandler(func(rcErr error) {
 
 		result = []entity.ProductStatus{}
 		resultErr = rcErr
 	})
-	productlist := db.GetHeader()
+	productlist := db.GetCurrentHeader()
 
 	return productlist, nil
 

@@ -2,6 +2,7 @@ package db
 
 import (
 	"FileReport/common"
+	"FileReport/db/handler"
 	"FileReport/entity"
 	"errors"
 	"github.com/beego/beego/v2/client/orm"
@@ -11,21 +12,21 @@ import (
 func SelectFileInfo(filename, productname string) entity.FileRecord {
 	o := orm.NewOrm()
 	var file entity.FileRecord
-	err := o.Raw("select file_name,major_version,minor_version,product_name,abolish_flag,publish_flag from file_info where file_name = ? and product_name = ? ", filename, productname).QueryRow(&file)
+	err := o.Raw(handler.Select_File_Info, filename, productname).QueryRow(&file)
 	common.ErrorHandler(err, "从数据库获取文档信息失败")
 	return file
 }
 func SelectRecentUpdate() []entity.FileRecord {
 	o := orm.NewOrm()
 	var fileinfolist []entity.FileRecord
-	_, err := o.Raw("select file_name,major_version,minor_version,product_name,abolish_flag,publish_flag from file_info where modify_time between date('now', \"-1 month\") and date('now',\"+1 day\")").QueryRows(&fileinfolist)
+	_, err := o.Raw(handler.Select_Recent_Update).QueryRows(&fileinfolist)
 	common.ErrorHandler(err, "从数据库获取最近更新信息失败")
 	return fileinfolist
 }
 func GetProductHeader() []entity.ProductInfo {
 	o := orm.NewOrm()
 	var productlist []entity.ProductInfo
-	nums, err := o.Raw("SELECT id,product_name,last_update_time,last_creater FROM product_info ").QueryRows(&productlist)
+	nums, err := o.Raw(handler.Select_Product_Header).QueryRows(&productlist)
 	common.ErrorHandler(err, "从数据库获取项目header信息失败")
 	if nums < 1 {
 		logs.Error("未查到项目header")
@@ -34,21 +35,21 @@ func GetProductHeader() []entity.ProductInfo {
 }
 func AbolishFile(to orm.TxOrmer, fileinfo entity.FileInfo) bool {
 
-	_, err := to.Raw("Update file_info SET abolish_flag = ?,publish_flag = ? , modifier = ? , modify_time = ? WHERE file_name = ? and product_name = ?",
+	_, err := to.Raw(handler.Update_Abolish_File,
 		common.Have_Abolish, common.Not_Publish, fileinfo.Modifier, fileinfo.ModifyTime, fileinfo.FileName, fileinfo.ProductName).Exec()
 	common.ErrorHandler(err, "废除文档失败")
 	return true
 }
 func PublishFile(to orm.TxOrmer, fileinfo entity.FileInfo) bool {
 
-	_, err := to.Raw("Update file_info SET abolish_flag = ?,publish_flag = ? , modifier = ? , modify_time = ? WHERE file_name = ? and product_name = ?",
+	_, err := to.Raw(handler.Update_Publish_File,
 		common.Not_Abolish, common.Have_Publish, fileinfo.Modifier, fileinfo.ModifyTime, fileinfo.FileName, fileinfo.ProductName).Exec()
 	common.ErrorHandler(err, "发布文档失败")
 	return true
 }
 func UpdateFile(to orm.TxOrmer, fileinfo entity.FileRecord) bool {
 
-	result, err := to.Raw("Update file_info SET major_version=?,minor_version=? , modifier = ? , modify_time = ? WHERE file_name = ? and product_name = ?",
+	result, err := to.Raw(handler.Update_File_Info,
 		fileinfo.MajorVersion, fileinfo.MinorVersion, fileinfo.Modifier, fileinfo.ModifyTime, fileinfo.FileName, fileinfo.ProductName).Exec()
 	common.ErrorHandler(err, "更新文档信息失败")
 	nums, _ := result.RowsAffected()
@@ -67,13 +68,13 @@ func Record(to orm.TxOrmer, record entity.FileRecord) bool {
 func GetProductInfo(productname string) entity.ProductInfo {
 	o := orm.NewOrm()
 	var product entity.ProductInfo
-	err := o.Raw("SELECT product_name,last_update_time,last_creater FROM product_info  WHERE product_name = ?", productname).QueryRow(&product)
+	err := o.Raw(handler.Select_ProductInfo_By_Name, productname).QueryRow(&product)
 	common.ErrorHandler(err, "从数据库获取项目信息失败")
 	return product
 }
 func InsertOrUpdateProduct(to orm.TxOrmer, productinfo entity.ProductInfo) bool {
 
-	result, err := to.Raw("Update product_info SET last_creater = ?,last_update_time=? WHERE product_name=?", productinfo.LastCreater, productinfo.LastUpdateTime, productinfo.ProductName).Exec()
+	result, err := to.Raw(handler.Update_Product_info, productinfo.LastCreater, productinfo.LastUpdateTime, productinfo.ProductName).Exec()
 	nums, _ := result.RowsAffected()
 	common.ErrorHandler(err, "更新项目信息失败")
 	if nums < 1 {
@@ -85,7 +86,7 @@ func InsertOrUpdateProduct(to orm.TxOrmer, productinfo entity.ProductInfo) bool 
 }
 func InsertOrUpdateFile(to orm.TxOrmer, fileinfo entity.FileInfo) bool {
 
-	result, err := to.Raw("Update file_info SET major_version=?,minor_version=? , modifier = ? , modify_time = ? WHERE file_name = ? and product_name = ?",
+	result, err := to.Raw(handler.Update_File,
 		fileinfo.MajorVersion, fileinfo.MinorVersion, fileinfo.Modifier, fileinfo.ModifyTime, fileinfo.FileName, fileinfo.ProductName).Exec()
 	common.ErrorHandler(err, "更新文档信息失败")
 	nums, _ := result.RowsAffected()
@@ -96,10 +97,10 @@ func InsertOrUpdateFile(to orm.TxOrmer, fileinfo entity.FileInfo) bool {
 	return true
 }
 
-func GetHeader() []entity.ProductStatus {
+func GetCurrentHeader() []entity.ProductStatus {
 	o := orm.NewOrm()
 	var productInfo []entity.ProductStatus
-	nums, err := o.Raw("SELECT product_name, COUNT( DISTINCT file_name ) AS file_number, COUNT( DISTINCT creater ) AS person_number, COUNT( * ) AS version_count  FROM file_record  GROUP BY product_name").QueryRows(&productInfo)
+	nums, err := o.Raw(handler.Select_Current_Header).QueryRows(&productInfo)
 	common.ErrorHandler(err, "从数据库获取当前状态header信息失败")
 	if nums < 1 {
 		common.ErrorHandler(errors.New("不存在此文件更新记录"), "从数据库获取当前状态header信息失败")
@@ -109,7 +110,7 @@ func GetHeader() []entity.ProductStatus {
 func GetLatestTrend() []entity.FileRecord {
 	o := orm.NewOrm()
 	var productInfo []entity.FileRecord
-	nums, err := o.Raw("SELECT *  FROM file_record  ").QueryRows(&productInfo)
+	nums, err := o.Raw(handler.Select_Latest_Trend).QueryRows(&productInfo)
 	common.ErrorHandler(err, "从数据库获取最新动态信息失败")
 	if nums < 1 {
 		common.ErrorHandler(errors.New("不存在更新记录"), "从数据库获取最新动态信息失败")
