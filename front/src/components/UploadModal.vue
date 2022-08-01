@@ -8,11 +8,9 @@
     >
       <el-upload
           ref="uploadRef"
-          class="upload-demo"
-          action=""
           :auto-upload="false"
           :on-exceed="handleExceed"
-          limit="1"
+          :limit="1"
           :http-request="httpRequest"
       >
         <template #trigger>
@@ -30,7 +28,7 @@
         </template>
       </el-upload>
       <div style="display: flex;align-items: center;justify-content: start">
-        <div  >手动版本调整：</div>
+        <div>手动版本调整：</div>
         <el-input v-model="motoVersion" size="small" style=";width: 50px" maxlength="5"/>
       </div>
       <template #footer>
@@ -43,8 +41,9 @@
 </template>
 
 <script lang="ts" setup>
-import {reactive, ref, toRef, toRefs, watchEffect} from "vue";
+import {computed, reactive, ref, toRef, toRefs, watchEffect} from "vue";
 import {ElMessage, genFileId, UploadInstance, UploadProps, UploadRawFile, UploadRequestOptions} from "element-plus";
+import {ComputedRef, WritableComputedRef} from "@vue/reactivity";
 
 
 const ak = 'SNZGBWTDEF0IRJKXJGJF';
@@ -52,28 +51,27 @@ const sk = 'W3H3nbgxHU3zDAblqwvTjO18V6X9ZeIexyn7Ter1';
 const server = 'obs.cn-north-4.myhuaweicloud.com';
 const bucket = 'file-report-store';
 
-const props = defineProps<{ isShow: boolean }>();
-const {isShow} = toRefs(props)
-// 组件内部状态控制
-const isDialogShow = ref(false)
-
+const props = defineProps<{ modelValue: boolean }>();
 const emit = defineEmits<{
-  (e: 'updatedCallBack'): void,
-  (e: 'closeCallBack'): void
+  (e: 'update:modelValue', v: boolean): void,
+  (e: 'updateSuccess'): void
 }>()
 
-watchEffect(() => {
-  // 响应参数变化，只有入参变化，才会触发
-  isDialogShow.value = isShow.value
+// 这种方式对组件内的组件更友好，且可操作性比较强
+const isDialogShow: WritableComputedRef<boolean> = computed({
+  get(): boolean {
+    return props.modelValue
+  },
+  set(value: boolean) {
+    emit('update:modelValue', value)
+  }
 })
+
 const handleClose = () => {
   // 清空自己
   uploadRef.value!.clearFiles()
   // 关闭自己
   isDialogShow.value = false
-  // 告诉父组件，变更v-modal
-  // 如果组件依赖父组件传参且改变状态，入参不可修改，需要通过事件通知父组件修改入参状态
-  emit('closeCallBack')
 }
 
 const uploadRef = ref<UploadInstance>()
@@ -111,10 +109,10 @@ const httpRequest = (options: UploadRequestOptions) => {
   }).then(function (result: any) {
     if (result.CommonMsg.Status < 300) {
       // 清空自己
-      uploadRef.value!.clearFiles()
+      handleClose()
       ElMessage.success('上传 ' + uploadFileName + ' 文件成功')
       // 上传成功
-      emit('updatedCallBack')
+      emit('updateSuccess')
     }
   });
 }

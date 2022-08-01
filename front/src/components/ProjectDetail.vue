@@ -1,7 +1,6 @@
 <template>
   <div style="padding: 20px">
-
-    <el-card style="width: 100%;  ">
+    <el-card style="width: 100%;">
       <div style="display: flex;flex-direction: row;justify-content: start;align-items: center">
         <div style="font-size: 18px">近期更新</div>
       </div>
@@ -111,12 +110,12 @@
     <div style="height: 20px"></div>
     <el-pagination background layout="prev, pager, next" :total="1000"/>
   </div>
-  <UploadModal @updatedCallBack="updatedCallBack" @closeCallBack="closeCallBack" :is-show="dialogVisible"></UploadModal>
+  <UploadModal v-model="dialogVisible" @updateSuccess="updateSuccess"></UploadModal>
 </template>
 
 <script lang="ts" setup>
 
-import {onMounted, reactive, ref} from "vue";
+import {onMounted, reactive, ref, watchEffect} from "vue";
 import {isDark} from "~/composables";
 // @ts-ignore
 import {Search, ArrowDown} from "@element-plus/icons-vue"
@@ -141,14 +140,6 @@ onMounted(() => {
 
 const searchContent = ref('')
 
-const updatedCallBack = () => {
-  console.log("上传成功")
-  dialogVisible.value = false
-//todo 更新页面
-}
-const closeCallBack = () => {
-  dialogVisible.value = false
-}
 
 const release = () => {
 
@@ -190,7 +181,9 @@ const dialogVisible = ref(false)
 const fileUpdate = () => {
   dialogVisible.value = true
 }
-
+const updateSuccess = () => {
+  console.log("更新list")
+}
 
 </script>
 <style>
