@@ -14,98 +14,67 @@ type FileResult struct {
 	Data    interface{} `json:"data"`
 }
 
-func GetProductHeader() (result *FileResult) {
-	o := orm.NewOrm()
+func GetProductHeader() (result []entity.ProductInfo, resultErr error) {
+
 	defer common.RecoverHandler(func(rcErr error) {
-		fileresult := new(FileResult)
-		fileresult.Success = false
-		fileresult.Msg = rcErr.Error()
-		result = fileresult
+		result = []entity.ProductInfo{}
+		resultErr = rcErr
 	})
-	file_result := new(FileResult)
-	productlist, err := db.GetProductHeader(o)
-	if err != nil {
-		panic(err)
-	}
-	file_result.Success = true
-	file_result.Msg = ""
-	file_result.Data = productlist
-	return file_result
+	productlist := db.GetProductHeader()
+	return productlist, nil
 }
-func GetRecentUpdate() (result *FileResult) {
-	o := orm.NewOrm()
+func GetRecentUpdate() (result []entity.FileRecord, resultErr error) {
 	defer common.RecoverHandler(func(rcErr error) {
-		fileresult := new(FileResult)
-		fileresult.Success = false
-		fileresult.Msg = rcErr.Error()
-		result = fileresult
+
+		result = []entity.FileRecord{}
 	})
-	file_result := new(FileResult)
-	productlist, err := db.SelectRecentUpdate(o)
-	if err != nil {
-		panic(err)
-	}
-	file_result.Success = true
-	file_result.Msg = ""
-	file_result.Data = productlist
-	return file_result
+	productlist := db.SelectRecentUpdate()
+
+	return productlist, nil
 }
 
-func UpdateFile(filename, productname, userid string, ma, mi int64) (result *FileResult) {
+func UpdateFile(filename, productname, userid string, ma, mi int64) (result string, resultErr error) {
 	o := orm.NewOrm()
 	to, err := o.Begin()
 	defer common.RecoverHandler(func(rcErr error) {
 		to.Rollback()
-		fileresult := new(FileResult)
-		fileresult.Success = false
-		fileresult.Msg = rcErr.Error()
-		result = fileresult
+		result = "fail"
+		resultErr = rcErr
 	})
 
-	file_result := new(FileResult)
 	if err != nil {
 		panic("****UpdateFile****start the transaction failed")
 	}
 	timenow := time.Now().Format("2006-01-02 15:04:05")
-	record, _ := db.SelectFileInfo(o, filename, productname)
+	record := db.SelectFileInfo(filename, productname)
 
 	record.Modifier = userid
 	record.ModifyTime = timenow
 	record.MinorVersion = ma
 	record.MinorVersion = mi
-	_, err = db.UpdateFile(to, record)
-	if err != nil {
-		panic("****UpdateFile****更新或上传文件失败" + err.Error())
-		to.Rollback()
-	}
+	_ = db.UpdateFile(to, record)
 
 	record.Operationtype = "update"
 	record.CreateTime = timenow
 	record.Creater = userid
 	record.Modifier = userid
 	record.ModifyTime = timenow
-	_, err = db.Record(to, record)
-	if err != nil {
-		panic("****UpdateFile****添加记录失败" + err.Error())
+	_ = db.Record(to, record)
 
-	}
 	_ = to.Commit()
-	file_result.Success = true
-	file_result.Msg = ""
-	return file_result
+
+	return "sucess", nil
 }
 
-func AbolishFile(filename, productname, userid string) (result *FileResult) {
+func AbolishFile(filename, productname, userid string) (result string, resultErr error) {
 	o := orm.NewOrm()
 	to, err := o.Begin()
 	defer common.RecoverHandler(func(rcErr error) {
 		to.Rollback()
-		fileresult := new(FileResult)
-		fileresult.Success = false
-		fileresult.Msg = rcErr.Error()
-		result = fileresult
+		result = "fail"
+		resultErr = rcErr
+
 	})
-	file_result := new(FileResult)
 	if err != nil {
 		panic("****PublishFile****start the transaction failed")
 	}
@@ -115,38 +84,29 @@ func AbolishFile(filename, productname, userid string) (result *FileResult) {
 	fileinfo.ProductName = productname
 	fileinfo.Modifier = userid
 	fileinfo.ModifyTime = timenow
-	_, err = db.AbolishFile(to, fileinfo)
-	if err != nil {
-		panic("****AbolishFile****废除文件失败" + err.Error())
-	}
-	record, _ := db.SelectFileInfo(o, filename, productname)
+	_ = db.AbolishFile(to, fileinfo)
+
+	record := db.SelectFileInfo(filename, productname)
 
 	record.Operationtype = "abolish"
 	record.CreateTime = timenow
 	record.Creater = userid
 	record.Modifier = userid
 	record.ModifyTime = timenow
-	_, err = db.Record(to, record)
-	if err != nil {
-		panic("****AbolishFile****添加记录失败" + err.Error())
+	_ = db.Record(to, record)
 
-	}
 	_ = to.Commit()
-	file_result.Success = true
-	file_result.Msg = ""
-	return file_result
+
+	return "success", nil
 }
-func PublishFile(filename, productname, userid string) (result *FileResult) {
+func PublishFile(filename, productname, userid string) (result string, resultErr error) {
 	o := orm.NewOrm()
 	to, err := o.Begin()
 	defer common.RecoverHandler(func(rcErr error) {
 		to.Rollback()
-		fileresult := new(FileResult)
-		fileresult.Success = false
-		fileresult.Msg = rcErr.Error()
-		result = fileresult
+		result = "fail"
+		resultErr = rcErr
 	})
-	file_result := new(FileResult)
 	if err != nil {
 		panic("****PublishFile****start the transaction failed")
 	}
@@ -155,46 +115,40 @@ func PublishFile(filename, productname, userid string) (result *FileResult) {
 	fileinfo.ProductName = productname
 	fileinfo.Modifier = userid
 	fileinfo.ModifyTime = time.Now().Format("2006-01-02 15:04:05")
-	_, err = db.PublishFile(to, fileinfo)
-	if err != nil {
-		panic("****PublishFile****发布文件失败" + err.Error())
-	}
-	record, _ := db.SelectFileInfo(o, filename, productname)
+	_ = db.PublishFile(to, fileinfo)
+
+	record := db.SelectFileInfo(filename, productname)
 	timenow := time.Now().Format("2006-01-02 15:04:05")
 	record.Operationtype = "abolish"
 	record.CreateTime = timenow
 	record.Creater = userid
 	record.Modifier = userid
 	record.ModifyTime = timenow
-	_, err = db.Record(to, record)
-	if err != nil {
-		panic("****PublishFile****添加记录失败" + err.Error())
-	}
+	_ = db.Record(to, record)
+
 	_ = to.Commit()
-	file_result.Success = true
-	file_result.Msg = ""
-	return file_result
+	return "success", nil
 }
-func Upload(filename, productname, ismajor, userid string) (result *FileResult) {
+func Upload(filename, productname, ismajor, userid string) (result string, resultErr error) {
 	o := orm.NewOrm()
 	to, err := o.Begin()
 	defer common.RecoverHandler(func(rcErr error) {
 		to.Rollback()
-		fileresult := new(FileResult)
-		fileresult.Success = false
-		fileresult.Msg = rcErr.Error()
-		result = fileresult
+		result = "fail"
+		resultErr = rcErr
 	})
-	file_result := new(FileResult)
-	product, _ := db.GetProductInfo(o, productname)
+	if err != nil {
+		panic("****PublishFile****start the transaction failed")
+	}
+	product := db.GetProductInfo(productname)
 
 	timenow := time.Now().Format("2006-01-02 15:04:05")
 	product.ProductName = productname
 	product.LastCreater = userid
 	product.LastUpdateTime = timenow
-	_, err = db.InsertOrUpdateProduct(to, product)
+	_ = db.InsertOrUpdateProduct(to, product)
 	fileinfo := entity.FileInfo{}
-	record, _ := db.SelectFileInfo(o, filename, productname)
+	record := db.SelectFileInfo(filename, productname)
 
 	major := int64(1)
 	minor := int64(1)
@@ -214,11 +168,8 @@ func Upload(filename, productname, ismajor, userid string) (result *FileResult) 
 	fileinfo.ProductName = productname
 	fileinfo.CreateTime = timenow
 	fileinfo.ModifyTime = timenow
-	_, err = db.InsertOrUpdateFile(to, fileinfo)
-	if err != nil {
-		panic("****UploadFile****添加或更新文件版本失败" + err.Error())
+	_ = db.InsertOrUpdateFile(to, fileinfo)
 
-	}
 	record.FileName = filename
 	record.ProductName = productname
 	record.Operationtype = "upload"
@@ -228,52 +179,31 @@ func Upload(filename, productname, ismajor, userid string) (result *FileResult) 
 	record.Creater = userid
 	record.Modifier = userid
 	record.ModifyTime = timenow
-	_, err = db.Record(to, record)
-	if err != nil {
-		panic("****UploadFile****添加记录失败" + err.Error())
+	_ = db.Record(to, record)
 
-	}
 	_ = to.Commit()
-	file_result.Success = true
-	file_result.Msg = ""
-	return file_result
+	return "success", nil
 
 }
-func GetHeader() (result *FileResult) {
-	o := orm.NewOrm()
+func GetCurrentHeader() (result []entity.ProductStatus, resultErr error) {
 	defer common.RecoverHandler(func(rcErr error) {
-		fileresult := new(FileResult)
-		fileresult.Success = false
-		fileresult.Msg = rcErr.Error()
-		result = fileresult
+
+		result = []entity.ProductStatus{}
+		resultErr = rcErr
 	})
-	file_result := new(FileResult)
-	productlist, err := db.GetHeader(o)
-	if err != nil {
-		panic(err)
-	}
-	file_result.Success = true
-	file_result.Msg = ""
-	file_result.Data = productlist
-	return file_result
+	productlist := db.GetCurrentHeader()
+
+	return productlist, nil
 
 }
-func GetLatestTrend() (result *FileResult) {
-	o := orm.NewOrm()
+func GetLatestTrend() (result []entity.FileRecord, resultErr error) {
 	defer common.RecoverHandler(func(rcErr error) {
-		fileresult := new(FileResult)
-		fileresult.Success = false
-		fileresult.Msg = rcErr.Error()
-		result = fileresult
+		result = []entity.FileRecord{}
+		resultErr = rcErr
 	})
-	file_result := new(FileResult)
-	productlist, err := db.GetLatestTrend(o)
-	if err != nil {
-		panic(err)
-	}
-	file_result.Success = true
-	file_result.Msg = ""
-	file_result.Data = productlist
-	return file_result
+
+	productlist := db.GetLatestTrend()
+
+	return productlist, nil
 
 }

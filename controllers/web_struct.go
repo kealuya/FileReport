@@ -12,4 +12,5 @@ type UserInfo struct {
 	Password string `json:"password"`
 	Username string `json:"username"`
 	UserRole string `json:"userRole"`
+	Modifier string `json:"modifier"`
 }
