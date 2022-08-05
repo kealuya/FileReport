@@ -20,8 +20,15 @@
     </el-card>
 
     <div style="height: 20px"></div>
-    <div style="width:600px;float: right">
-      <el-input v-model="searchContent" placeholder="检索" class="input-with-select">
+    <div style="width:100%;display: flex;justify-content: space-between">
+      <div>
+        <el-button type="primary" @click="fileUpdate(UPLOAD_MODAL_MODE.NEW)">
+          新建文档
+          <div style="width: 10px;"></div>
+          <el-image style="width: 20px; height: 20px" src="/folder/icon-new-file.png"></el-image>
+        </el-button>
+      </div>
+      <el-input style="width:600px" v-model="searchContent" placeholder="检索" class="input-with-select">
         <template #prepend>
           <el-button :icon="Search"/>
         </template>
@@ -53,7 +60,7 @@
         <template #default="scope">
           <div style="display: flex; align-items: center">
             <span style="margin-left: 10px">{{ scope.row.version }}</span>
-            <template v-if="scope.row.isRelease===false">
+            <template v-if="scope.row.isRelease===true">
               <div class="release">
                 发布
               </div>
@@ -62,7 +69,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column prop="updateDate" label="更新时间" sortable min-width="180">
+      <el-table-column prop="updateDate" label="更新时间" sortable min-width="140">
         <template #default="scope">
           <div style="display: flex; align-items: center">
             <span style="margin-left: 10px">{{ scope.row.updateDate }}</span>
@@ -78,7 +85,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="追加时间" sortable min-width="180">
+      <el-table-column label="追加时间" sortable min-width="140">
         <template #default="scope">
           <div style="display: flex; align-items: center">
             <span style="margin-left: 10px">{{ scope.row.createDate }}</span>
@@ -86,10 +93,18 @@
         </template>
       </el-table-column>
 
+      <el-table-column label="所有者" sortable min-width="50">
+        <template #default="scope">
+          <div style="display: flex; align-items: center">
+            <span style="margin-left: 10px">{{ scope.row.owner }}</span>
+          </div>
+        </template>
+      </el-table-column>
+
       <el-table-column label="操作" min-width="100">
         <template #default="scope">
           <el-dropdown>
-            <el-button size="small" type="primary">
+            <el-button type="primary">
               操作
               <el-icon class="el-icon--right">
                 <arrow-down/>
@@ -97,10 +112,10 @@
             </el-button>
             <template #dropdown>
               <el-dropdown-menu>
-                <el-dropdown-item @click="fileUpdate">更新上传</el-dropdown-item>
-                <el-dropdown-item @click="release">权限调整</el-dropdown-item>
-                <el-dropdown-item>废弃文件</el-dropdown-item>
-                <el-dropdown-item>版本管理</el-dropdown-item>
+                <el-dropdown-item @click="fileUpdate(UPLOAD_MODAL_MODE.UPLOAD,scope.row)">更新上传</el-dropdown-item>
+                <el-dropdown-item @click="fileAuthority(scope.row)">权限调整</el-dropdown-item>
+                <el-dropdown-item @click="fileDiscard(scope.row)">废弃文件</el-dropdown-item>
+                <el-dropdown-item @click="fileHistory">版本历史</el-dropdown-item>
               </el-dropdown-menu>
             </template>
           </el-dropdown>
@@ -110,27 +125,31 @@
     <div style="height: 20px"></div>
     <el-pagination background layout="prev, pager, next" :total="1000"/>
   </div>
-  <UploadModal v-model="dialogVisible" @updateSuccess="updateSuccess"></UploadModal>
-</template>
+  <UploadModal v-model="uploadModalDialogVisible" :mode="uploadModalMode" :item="selectFile"
+               @updateSuccess="updateSuccess"></UploadModal>
 
+  <DiscardModal v-model="discardModalDialogVisible" :item="selectFile"
+                @discardSuccess="discardSuccess"></DiscardModal>
+
+  <AuthorityModal v-model="authorityModalDialogVisible" :item="selectFile"
+                  @authoritySuccess="authoritySuccess"></AuthorityModal>
+</template>
 <script lang="ts" setup>
 
-import {onMounted, reactive, ref, watchEffect} from "vue";
-import {isDark} from "~/composables";
 // @ts-ignore
 import {Search, ArrowDown} from "@element-plus/icons-vue"
+import {onMounted, reactive, ref} from "vue";
 import {ElLoading} from "element-plus/es";
-
-interface File {
-  updateDate: string
-  createDate: string
-  name: string
-  updateUser: string
-  version: string
-  isHandlerButtonShow?: boolean
-  fileType: string
-  isRelease: false
-}
+import {ElNotification} from "element-plus/es/components/notification/index";
+/*
+  [Bug Report] ElNotification样式错乱 #5968
+  https://github.com/element-plus/element-plus/issues/5968
+  https://github.com/element-plus/element-plus/issues/5667
+  ElNotification 样式错乱问题
+  需要手动引入对应组件的样式，才可以。暂时发现【ElNotification】【ElMessageBox】
+ */
+import "element-plus/es/components/notification/style/index";
+import {UPLOAD_MODAL_MODE} from "~/enum";
 
 onMounted(() => {
   const loadingInstance = ElLoading.service({fullscreen: true})
@@ -146,7 +165,7 @@ const release = () => {
 
 }
 
-const tableData: File[] = reactive(
+const tableData: MyFile[] = reactive(
     []
 )
 for (let i = 0; i < 15; i++) {
@@ -157,32 +176,79 @@ for (let i = 0; i < 15; i++) {
     updateUser: '边宇辰',
     version: 'v1.22',
     fileType: "111",
-    isRelease: false
+    isRelease: false,
+    id: "",
+    isOwnerEdit: true,
+    owner: "张三",
+    updateContent: "",
+    ownerId: ""
   })
 }
 
-const headerData: File[] = reactive(
+const headerData: MyFile[] = reactive(
     []
 )
 
 for (let i = 0; i < 3; i++) {
   headerData.push({
+    ownerId: "",
     updateDate: '2016-05-03 12:32:55',
     name: '浩天业财融合结算平台接口文档-v17(2)(1)111.docx',
     createDate: '2017-08-03 12:32:51',
     updateUser: '边宇辰',
     version: 'v1.22',
     fileType: 'word',
-    isRelease: false
+    isRelease: false,
+    id: "",
+    isOwnerEdit: true,
+    owner: "张三",
+    updateContent: ""
   })
 }
 
-const dialogVisible = ref(false)
-const fileUpdate = () => {
-  dialogVisible.value = true
+const uploadModalDialogVisible = ref(false)
+const selectFile = ref({})
+const uploadModalMode = ref<UPLOAD_MODAL_MODE>()
+const fileUpdate = (type: UPLOAD_MODAL_MODE, item?: MyFile) => {
+  if (type == UPLOAD_MODAL_MODE.NEW) {
+    selectFile.value = {}
+    uploadModalMode.value = UPLOAD_MODAL_MODE.NEW
+    uploadModalDialogVisible.value = true
+  } else if (type == UPLOAD_MODAL_MODE.UPLOAD) {
+    selectFile.value = item!
+    uploadModalMode.value = UPLOAD_MODAL_MODE.UPLOAD
+    uploadModalDialogVisible.value = true
+  }
 }
 const updateSuccess = () => {
   console.log("更新list")
+}
+
+const discardSuccess = () => {
+  console.log("删除")
+}
+const discardModalDialogVisible = ref(false)
+const fileDiscard = (item: MyFile) => {
+  selectFile.value = item
+  discardModalDialogVisible.value = true
+}
+
+const authoritySuccess = () => {
+  console.log("权限")
+}
+const authorityModalDialogVisible = ref(false)
+const fileAuthority = (item: MyFile) => {
+  selectFile.value = item
+  authorityModalDialogVisible.value = true
+}
+
+const fileHistory = () => {
+  ElNotification({
+    title: '版本历史',
+    message: '等等，下次再说',
+    type: 'warning',
+    offset: 300
+  })
 }
 
 </script>

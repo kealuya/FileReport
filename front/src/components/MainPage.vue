@@ -53,6 +53,7 @@
 import {reactive, ref} from "vue";
 import {ElMessage, ElLoading} from 'element-plus'
 import {useRouter} from "vue-router";
+import {useUserStore} from "~/stores";
 
 const count = ref(0);
 const input = ref("element-plus");
@@ -182,6 +183,9 @@ const projectActiveData = reactive<Array<{ projectName: string, releaseCount: st
       },
     ]
 )
+
+let userStore = useUserStore()
+userStore.test("dfd")
 
 
 </script>

@@ -12,24 +12,36 @@
           :on-exceed="handleExceed"
           :limit="1"
           :http-request="httpRequest"
+          :on-change="onChange"
       >
         <template #trigger>
           <el-button type="primary">选择文件</el-button>
         </template>
 
-        <el-button class="ml-3" type="success" @click="submitUpload">
+        <el-button ref="uploadHandler" :disabled="isUploadBtnDisabled" class="ml-3" type="success"
+                   @click="submitUpload">
           上传
         </el-button>
 
-        <template #tip>
-          <div class="el-upload__tip">
-            上传的文件会自动版本+0.01，并维持既存文件名称
-          </div>
-        </template>
       </el-upload>
+      <el-divider/>
       <div style="display: flex;align-items: center;justify-content: start">
-        <div>手动版本调整：</div>
-        <el-input v-model="motoVersion" size="small" style=";width: 50px" maxlength="5"/>
+        <div>文档名称：</div>
+        <el-input v-model="item.name" size="small" style=";width: 450px"/>
+      </div>
+      <div style="height: 10px;"></div>
+      <div style="display: flex;align-items: center;justify-content: start">
+        <div>当前版本：</div>
+        <el-input disabled v-model="item.version" size="small" style="margin-right: 20px;width: 80px" maxlength="5"/>
+        <template v-if="mode==UPLOAD_MODAL_MODE.UPLOAD">
+          <div>更新后版本：</div>
+          <el-input v-model="updatedVersion" size="small" style=";width: 80px" maxlength="5"/>
+        </template>
+      </div>
+      <div style="height: 10px;"></div>
+      <div style="display: flex;align-items: center;justify-content: start">
+        <div>文件类型：</div>
+        <el-input disabled v-model="item.fileType" size="small" style=";width: 80px" maxlength="5"/>
       </div>
       <template #footer>
       <span class="dialog-footer">
@@ -41,17 +53,27 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, reactive, ref, toRef, toRefs, watchEffect} from "vue";
-import {ElMessage, genFileId, UploadInstance, UploadProps, UploadRawFile, UploadRequestOptions} from "element-plus";
+import {computed, getCurrentInstance, reactive, ref, toRef, toRefs, watchEffect} from "vue";
+import {
+  ElMessage,
+  ElMessageBox,
+  genFileId,
+  UploadFile,
+  UploadInstance,
+  UploadProps,
+  UploadRawFile,
+  UploadRequestOptions
+} from "element-plus";
 import {ComputedRef, WritableComputedRef} from "@vue/reactivity";
-
+import {UPLOAD_MODAL_MODE} from "~/enum";
 
 const ak = 'SNZGBWTDEF0IRJKXJGJF';
 const sk = 'W3H3nbgxHU3zDAblqwvTjO18V6X9ZeIexyn7Ter1';
 const server = 'obs.cn-north-4.myhuaweicloud.com';
 const bucket = 'file-report-store';
-
-const props = defineProps<{ modelValue: boolean }>();
+// ==============================================================================
+// 组件 v-modal 模式
+const props = defineProps<{ modelValue: boolean, mode: UPLOAD_MODAL_MODE, item: MyFile }>();
 const emit = defineEmits<{
   (e: 'update:modelValue', v: boolean): void,
   (e: 'updateSuccess'): void
@@ -66,10 +88,14 @@ const isDialogShow: WritableComputedRef<boolean> = computed({
     emit('update:modelValue', value)
   }
 })
-
+// ==============================================================================
 const handleClose = () => {
+
   // 清空自己
   uploadRef.value!.clearFiles()
+
+  isUploadBtnDisabled.value = true
+  updatedVersion.value = ""
   // 关闭自己
   isDialogShow.value = false
 }
@@ -84,6 +110,11 @@ const handleExceed: UploadProps['onExceed'] = (files) => {
   uploadRef.value!.handleStart(file)
 }
 const submitUpload = () => {
+  // check版本号
+  if (!updatedVersion.value.match("v\\d\\.\\d\\d")) {
+    ElMessage.error("版本号不正确(v9.99)")
+    return
+  }
   // submit方法出发httpRequest方法执行
   uploadRef.value!.submit()
 }
@@ -117,7 +148,39 @@ const httpRequest = (options: UploadRequestOptions) => {
   });
 }
 
-const motoVersion = ref('v1.34')
+const isUploadBtnDisabled = ref(true)
+const updatedVersion = ref("")
+const onChange = (file: UploadFile) => {
+
+  let fileName = file.name
+  let fileType = fileName.substring(fileName.lastIndexOf(".") + 1)
+  // 判断是否是文档文件
+  if (fileType.match("doc|docx|ppt|pptx|xls|xlsx|pdf")) {
+    // 判断是 new 还是 update
+    // new
+    if (props.mode == UPLOAD_MODAL_MODE.NEW) {
+      props.item.fileType = fileType
+      props.item.name = fileName
+      props.item.version = "v1.00"
+      isUploadBtnDisabled.value = false
+    } else {
+      // update
+      // v1.00 + 0.01 计算
+      updatedVersion.value = "v" + (parseFloat(props.item.version.replace("v", "")) + 0.01).toString()
+      isUploadBtnDisabled.value = false
+    }
+
+  } else {
+    // 不是文档文件，报错
+    // 清空操作
+    uploadRef.value!.clearFiles()
+    isUploadBtnDisabled.value = true
+    updatedVersion.value = ""
+    ElMessage.error('上传文件类型不支持')
+  }
+
+
+}
 
 </script>
 
