@@ -148,6 +148,37 @@ func (fCtrl *FlieController) PublishFile() {
 	resJson.Data = result
 
 }
+func (fCtrl *FlieController) AuthorityFile() {
+	resJson := NewJsonStruct(nil)
+	defer func() {
+		fCtrl.Data["json"] = resJson
+		fCtrl.ServeJSON()
+	}()
+	authorityFileFileRequestKey := AuthorityFile{}
+	res := fCtrl.Ctx.Input.RequestBody
+	err_Unmarshal := json.Unmarshal(res, &authorityFileFileRequestKey)
+	if err_Unmarshal != nil {
+		resJson.Success = false
+		resJson.Msg = fmt.Sprintf("系统错误 : %s", err_Unmarshal.Error())
+		logs.Error(err_Unmarshal)
+		return
+	}
+	result, err_Authority := models.AuthorityFile(
+		authorityFileFileRequestKey.FlieName,
+		authorityFileFileRequestKey.ProductName,
+		authorityFileFileRequestKey.Userid,
+		authorityFileFileRequestKey.IsOwnerEdit,
+		authorityFileFileRequestKey.IsRelease)
+	if err_Authority != nil {
+		resJson.Success = false
+		resJson.Msg = fmt.Sprintf("更改文件权限失败 : %s", err_Authority.Error())
+		logs.Error(err_Authority)
+		return
+	}
+	resJson.Data = result
+
+}
+
 func (fCtrl *FlieController) UpdateFile() {
 	resJson := NewJsonStruct(nil)
 	defer func() {

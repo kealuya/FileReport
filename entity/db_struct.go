@@ -20,8 +20,9 @@ type FileInfo struct {
 	MajorVersion int64
 	MinorVersion int64
 	ProductName  string
-	AbolishFlag  string `orm:"null;default(0)"`
-	PublishFlag  string `orm:"null;default(0)"`
+	AbolishFlag  string `orm:"default(0)"`
+	PublishFlag  string `orm:"default(0)"`
+	EditFlag     string `orm:"default(0)"`
 	CreateTime   string `orm:"null"`
 	Creater      string `orm:"null"`
 	ModifyTime   string `orm:"null"`
