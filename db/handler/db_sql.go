@@ -18,9 +18,9 @@ const (
 
 	Update_File_Info = `Update file_info SET major_version=?,minor_version=? , modifier = ? , modify_time = ? WHERE file_name = ? and product_name = ?`
 
-	Update_Publish_File = `Update file_info SET abolish_flag = ?,publish_flag = ? , modifier = ? , modify_time = ? WHERE file_name = ? and product_name = ?`
-
-	Update_Abolish_File = `Update file_info SET abolish_flag = ?,publish_flag = ? , modifier = ? , modify_time = ? WHERE file_name = ? and product_name = ?`
+	Update_Publish_File   = `Update file_info SET abolish_flag = ?,publish_flag = ? , modifier = ? , modify_time = ? WHERE file_name = ? and product_name = ?`
+	Update_Authority_File = `Update file_info SET edit_flag = ?,publish_flag = ? , modifier = ? , modify_time = ? WHERE file_name = ? and product_name = ?`
+	Update_Abolish_File   = `Update file_info SET abolish_flag = ?,publish_flag = ? , modifier = ? , modify_time = ? WHERE file_name = ? and product_name = ?`
 
 	Select_Product_Header = `SELECT id,product_name,last_update_time,last_creater FROM product_info `
 

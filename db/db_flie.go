@@ -47,6 +47,13 @@ func PublishFile(to orm.TxOrmer, fileinfo entity.FileInfo) bool {
 	common.ErrorHandler(err, "发布文档失败")
 	return true
 }
+func AuthorityFile(to orm.TxOrmer, fileinfo entity.FileInfo) bool {
+
+	_, err := to.Raw(handler.Update_Authority_File,
+		fileinfo.EditFlag, fileinfo.PublishFlag, fileinfo.Modifier, fileinfo.ModifyTime, fileinfo.FileName, fileinfo.ProductName).Exec()
+	common.ErrorHandler(err, "发布文档失败")
+	return true
+}
 func UpdateFile(to orm.TxOrmer, fileinfo entity.FileRecord) bool {
 
 	result, err := to.Raw(handler.Update_File_Info,

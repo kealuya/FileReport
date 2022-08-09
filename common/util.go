@@ -60,4 +60,8 @@ const (
 	Have_Publish_Msg = "已发布"
 	Not_Publish      = "0"
 	Not_Publish_Msg  = "未发布"
+	OwnEdit          = "0"
+	OwnEdit_Msg      = "仅自己"
+	Not_OwnEdit      = "1"
+	Not_OwnEdit_Msg  = "所有人"
 )

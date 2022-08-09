@@ -129,6 +129,45 @@ func PublishFile(filename, productname, userid string) (result string, resultErr
 	_ = to.Commit()
 	return "success", nil
 }
+func AuthorityFile(filename, productname, userid string, IsOwnerEdit, IsRelease bool) (result string, resultErr error) {
+	o := orm.NewOrm()
+	to, err := o.Begin()
+	defer common.RecoverHandler(func(rcErr error) {
+		to.Rollback()
+		result = "fail"
+		resultErr = rcErr
+	})
+	if err != nil {
+		panic("****AuthorityFile****start the transaction failed")
+	}
+	fileinfo := entity.FileInfo{}
+	fileinfo.FileName = filename
+	fileinfo.ProductName = productname
+	fileinfo.Modifier = userid
+	fileinfo.ModifyTime = time.Now().Format("2006-01-02 15:04:05")
+	fileinfo.EditFlag = "0"
+	fileinfo.PublishFlag = "0"
+	if !IsOwnerEdit {
+		fileinfo.EditFlag = "1"
+	}
+	if IsRelease {
+		fileinfo.PublishFlag = "1"
+	}
+	_ = db.AuthorityFile(to, fileinfo)
+
+	record := db.SelectFileInfo(filename, productname)
+	timenow := time.Now().Format("2006-01-02 15:04:05")
+	record.Operationtype = "authority"
+	record.CreateTime = timenow
+	record.Creater = userid
+	record.Modifier = userid
+	record.ModifyTime = timenow
+	_ = db.Record(to, record)
+
+	_ = to.Commit()
+	return "success", nil
+}
+
 func Upload(filename, productname, ismajor, userid string) (result string, resultErr error) {
 	o := orm.NewOrm()
 	to, err := o.Begin()
