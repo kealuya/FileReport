@@ -7,4 +7,23 @@ declare module "*.vue" {
     export default component;
 }
 
+
+declare interface MyFile {
+    id: string
+    updateDate: string
+    createDate: string
+    name: string
+    updateUser: string
+    updateContent: string
+    version: string
+    //
+    isHandlerButtonShow?: boolean
+    fileType: string
+    isRelease: false
+    isOwnerEdit: true
+    owner: string
+    ownerId: string
+
+}
+
 declare module 'vue-countup-v2';

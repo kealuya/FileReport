@@ -184,8 +184,6 @@ const projectActiveData = reactive<Array<{ projectName: string, releaseCount: st
     ]
 )
 
-let userStore = useUserStore()
-userStore.test("dfd")
 
 
 </script>

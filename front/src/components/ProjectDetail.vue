@@ -101,7 +101,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="操作" min-width="100">
+      <el-table-column label="操作" min-width="120">
         <template #default="scope">
           <el-dropdown>
             <el-button type="primary">

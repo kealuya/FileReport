@@ -15,3 +15,5 @@ pnpm-lock.yaml
 /static/dist/*
 
 .idea/
+
+front/src/components.d.ts

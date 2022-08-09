@@ -1,5 +1,5 @@
-import path, {resolve} from 'path'
-import {defineConfig} from 'vite'
+import {resolve} from 'path'
+import {UserConfigExport, ConfigEnv, loadEnv} from "vite";
 import vue from '@vitejs/plugin-vue'
 
 import Components from 'unplugin-vue-components/vite'
@@ -13,74 +13,93 @@ import {
     transformerDirectives,
     transformerVariantGroup,
 } from 'unocss'
+import * as path from "path";
 
-const pathSrc = path.resolve(__dirname, 'src')
+// 当前执行node命令时文件夹的地址（工作目录）
+const pathSrc = path.resolve(__dirname, 'src') ///Users/kealuya/mywork/my_git/FileReport/front/src
+
+///Users/kealuya/mywork/my_git/FileReport/front
+// 下面两个等价
+const root: string = process.cwd();
 const pathRoot = path.resolve(__dirname, '')
 
 // https://vitejs.dev/config/
-export default defineConfig({
+export default ({command, mode}: ConfigEnv): UserConfigExport => {
+    /*
+        serve
+        development
+     */
+    console.log(command);// serve build
+    console.log(mode);// 开发模式、生产模式
 
+    const {
+        VITE_PORT,
+        VITE_PROXY_DOMAIN,// 一般都叫api，没用上
+        VITE_PROXY_DOMAIN_REAL
+    } = loadEnv(mode, root);
 
-    build:{
-        outDir:"../static/dist/",
+    return {
+        build: {
+            outDir: "../static/dist/",
 
-    },
-    resolve: {
-        alias: {
-            '@': resolve(process.cwd(), '/src'),
-            '#': resolve(process.cwd(), '/types'),
-            '~/': `${pathSrc}/`,
-        }
-    },
-    server: {
-        port: 3002,
-        open: false,
-        proxy: {
-            '/api': {
-                target: 'http://admin.xueyueob.cn/api',
-                changeOrigin: true,
-                ws: true,
-                rewrite: (path) => path.replace(new RegExp('^/api'), '')
+        },
+        resolve: {
+            alias: {
+                '@': resolve(process.cwd(), '/src'),
+                '#': resolve(process.cwd(), '/types'),
+                '~/': `${pathSrc}/`,
             }
-        }
-    },
-    css: {
-        preprocessorOptions: {
-            scss: {
-                additionalData: `@use "~/styles/element/index.scss" as *;`,
+        },
+        server: {
+            port: parseInt(VITE_PORT),
+            open: false,
+            proxy: {
+                '/api': {
+                    target: VITE_PROXY_DOMAIN_REAL,
+                    changeOrigin: true,
+                    ws: true,
+                    rewrite: (path) => path.replace(new RegExp('^/api'), '')
+                }
+            }
+        },
+        css: {
+            preprocessorOptions: {
+                scss: {
+                    additionalData: `@use "~/styles/element/index.scss" as *;`,
+                },
             },
         },
-    },
-    plugins: [
-        vue(),
-        Components({
-            // allow auto load markdown components under `./src/components/`
-            extensions: ['vue', 'md'],
-            // allow auto import and register components used in markdown
-            include: [/\.vue$/, /\.vue\?vue/, /\.md$/],
-            resolvers: [
-                ElementPlusResolver({
-                    importStyle: 'sass',
-                }),
-            ],
-            dts: 'src/components.d.ts',
-        }),
+        plugins: [
+            vue(),
+            Components({
+                // allow auto load markdown components under `./src/components/`
+                extensions: ['vue', 'md'],
+                // allow auto import and register components used in markdown
+                include: [/\.vue$/, /\.vue\?vue/, /\.md$/],
+                resolvers: [
+                    ElementPlusResolver({
+                        importStyle: 'sass',
+                    }),
+                ],
+                dts: 'src/components.d.ts',
+            }),
 
-        // https://github.com/antfu/unocss
-        // see unocss.config.ts for config
-        Unocss({
-            presets: [
-                presetUno(),
-                presetAttributify(),
-                presetIcons({
-                    scale: 1.2,
-                    warn: true,
-                }),
-            ],
-            transformers: [
-                transformerDirectives(),
-                transformerVariantGroup(),
-            ]
-        }),
-    ],
-})
+            // https://github.com/antfu/unocss
+            // see unocss.config.ts for config
+            Unocss({
+                presets: [
+                    presetUno(),
+                    presetAttributify(),
+                    presetIcons({
+                        scale: 1.2,
+                        warn: true,
+                    }),
+                ],
+                transformers: [
+                    transformerDirectives(),
+                    transformerVariantGroup(),
+                ]
+            }),
+        ],
+    }
+}

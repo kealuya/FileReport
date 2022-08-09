@@ -2,7 +2,7 @@
 
   <BaseHeader/>
   <div class="main-window">
-    <div style="width: 80%">
+    <div style="width: 90%">
       <router-view/>
     </div>
   </div>

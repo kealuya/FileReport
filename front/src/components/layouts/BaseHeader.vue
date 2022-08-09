@@ -32,7 +32,7 @@
           </el-col>
         </el-row>
       </template>
-      <el-menu-item style="height: 60px;" index="login">我是社内人员</el-menu-item>
+      <el-menu-item style="height: 60px;" @click="login" index="login">我是社内人员</el-menu-item>
     </el-sub-menu>
     <el-menu-item @click="toggleDark()">
       <button class="border-none w-full bg-transparent cursor-pointer" style="height: 60px;">
@@ -51,6 +51,7 @@
     </div>
   </el-dialog>
 
+  <LoginModal v-model="isShowLoginModal"/>
 
 </template>
 
@@ -72,6 +73,11 @@ watchEffect(
 
 const searchHandle = () => {
   isShowFaker.value = !isShowFaker.value
+}
+
+const isShowLoginModal = ref(false)
+const login = () => {
+  isShowLoginModal.value = !isShowLoginModal.value
 }
 
 
