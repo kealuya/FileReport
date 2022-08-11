@@ -5,9 +5,11 @@ import (
 	"github.com/beego/beego/v2/core/logs"
 	jsoniter "github.com/json-iterator/go"
 	"log"
+	"math/rand"
 	"reflect"
 	"runtime/debug"
 	"strconv"
+	"time"
 )
 
 func Marshal(v interface{}) []byte {
@@ -23,7 +25,7 @@ func Marshal(v interface{}) []byte {
 //共通错误recover处理方法
 func RecoverHandler(f func(err error)) {
 	if err := recover(); err != nil {
-		logs.Error("★★★★错误recover::", err)
+		logs.Error("发生系统panic::", err)
 		logs.Error(string(debug.Stack()))
 		reflect.TypeOf(&err).String()
 		if f != nil {
@@ -40,7 +42,7 @@ func RecoverHandler(f func(err error)) {
 //共通错误error处理方法
 func ErrorHandler(err error, info ...interface{}) {
 	if err != nil {
-		logs.Error("★★★错误error::", err, info)
+		logs.Error("发生系统panic::", err, info)
 		log.Panicln(err)
 	}
 }
@@ -65,3 +67,21 @@ const (
 	Not_OwnEdit      = "1"
 	Not_OwnEdit_Msg  = "所有人"
 )
+
+func GenerateSubId(n int32) string {
+	var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+	b := make([]rune, n)
+	for i := range b {
+		b[i] = letterRunes[rand.New(rand.NewSource(time.Now().UnixNano())).Intn(len(letterRunes))]
+	}
+	return string(b)
+}
+
+func GenerateNumberCode(n int32) string {
+	var letterRunes = []rune("0123456789")
+	b := make([]rune, n)
+	for i := range b {
+		b[i] = letterRunes[rand.New(rand.NewSource(time.Now().UnixNano())).Intn(len(letterRunes))]
+	}
+	return string(b)
+}

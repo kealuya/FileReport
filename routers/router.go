@@ -45,6 +45,9 @@ func init() {
 			beego.NSNamespace("/user",
 				beego.NSRouter("/editPeople", &controllers.UserController{}, "post:EditPeople"),
 			),
+			// =========================
+			beego.NSRouter("/getCaptcha", &controllers.UserController{}, "post:GetCaptcha"),
+			beego.NSRouter("/loginFr", &controllers.UserController{}, "post:LoginFr"),
 		)
 	beego.AddNamespace(namespace)
 

@@ -1,0 +1,9 @@
+kind: reverse
+name: mydb
+source:
+  database: sqlite3
+  conn_str: './filereport.db'
+targets:
+  - type: codes
+    language: golang
+    output_dir: ./entity

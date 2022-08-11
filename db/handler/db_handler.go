@@ -3,12 +3,13 @@ package handler
 import (
 	"FileReport/entity"
 	"github.com/beego/beego/v2/client/orm"
+	"github.com/beego/beego/v2/core/config"
 	"github.com/beego/beego/v2/core/logs"
 	_ "github.com/mattn/go-sqlite3"
 )
 
-const (
-	_DB_NAME        = "D:\\sqlite\\filereport.db"
+var (
+	_DB_NAME, _     = config.String("dbfilepath")
 	_SQLITE3_DRIVER = "sqlite3"
 )
 

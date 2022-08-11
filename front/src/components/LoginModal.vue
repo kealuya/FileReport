@@ -70,14 +70,16 @@ const isDialogShow: WritableComputedRef<boolean> = computed({
   }
 })
 // ==============================================================================
-import type {FormInstance} from 'element-plus'
+import {ElMessageBox, FormInstance} from 'element-plus'
+import {callGetCaptcha, callLoginWithCaptcha} from "~/utils/user";
+import "element-plus/es/components/message-box/style/index";
 
 const loginFormRef = ref<FormInstance>()
 const loginForm = reactive({
   inputPhoneNumber: '',
   captcha: '',
 })
-
+// 表单验证规则
 const loginRules = reactive({
   inputPhoneNumber: [{
     validator: (rule: any, value: any, callback: any) => {
@@ -103,32 +105,53 @@ const loginRules = reactive({
   }],
 })
 
+// 登录
+const userStore = useUserStore()
 const submitForm = (formEl: FormInstance | undefined) => {
   if (!formEl) return
   formEl.validate((valid) => {
     if (valid) {
-      // console.log('submit!')
-      console.log(loginForm.inputPhoneNumber, loginForm.captcha)
+      callLoginWithCaptcha(loginForm.inputPhoneNumber, loginForm.captcha).then((res: HttpResponse) => {
+        if (res.success) {
+          let user = res.data as User
+          userStore.loginSuccess(user)
+          isDialogShow.value = false;
+          resetForm(loginFormRef.value)
+        } else {
+          ElMessageBox.alert(res.msg, '提示', {
+            confirmButtonText: '好的',
+            callback: () => {
+              // resetForm(loginFormRef.value)
+            }
+          })
+        }
+      })
     } else {
-
       return false
     }
   })
 }
-
+// 重置表单
 const resetForm = (formEl: FormInstance | undefined) => {
   if (!formEl) return
   formEl.resetFields()
 }
 
-//
-const userStore = useUserStore()
+// 获取验证码
 const getCaptcha = (formEl: FormInstance | undefined) => {
   if (!formEl) return
   formEl.validateField("inputPhoneNumber", (valid) => {
     if (valid) {
-      userStore.getCaptcha(loginForm.inputPhoneNumber)
-      wait60sCountDown()
+      callGetCaptcha(loginForm.inputPhoneNumber).then((res: HttpResponse) => {
+        if (res.success) {
+          // 倒计时
+          wait60sCountDown()
+        } else {
+          ElMessageBox.alert(res.msg, '提示', {
+            confirmButtonText: '好的',
+          })
+        }
+      })
     } else {
       return false
     }
@@ -154,6 +177,7 @@ const wait60sCountDown = (id?: NodeJS.Timer) => {
     wait60s.value = 60
   }
 }
+
 
 </script>
 

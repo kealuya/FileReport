@@ -2,10 +2,12 @@ package models
 
 import (
 	"FileReport/common"
+	"FileReport/conf"
 	"FileReport/db"
 	"FileReport/entity"
 	"errors"
 	"github.com/beego/beego/v2/client/orm"
+	"log"
 	"time"
 )
 
@@ -87,4 +89,46 @@ func EditPeople(userid, password, username, userrole, modifier string) (result s
 
 	_ = to.Commit()
 	return "success", nil
+}
+
+func ObtainUser(phoneNumber string) (has bool, user entity.User, funcErr error) {
+
+	common.RecoverHandler(func(err error) {
+		has = false
+		user = entity.User{}
+		funcErr = err
+		return
+	})
+
+	userData := new(entity.User)
+	hasData, err_Get := conf.Engine.Where("phone_number=?", phoneNumber).And("is_disable<>'yes'").Get(userData)
+	common.ErrorHandler(err_Get)
+
+	return hasData, *userData, nil
+
+}
+
+func UserLoginHandler(phoneNumber string) (user entity.User, funcErr error) {
+
+	common.RecoverHandler(func(err error) {
+		user = entity.User{}
+		funcErr = err
+		return
+	})
+
+	userData := new(entity.User)
+	_, err_Get := conf.Engine.Where("phone_number=?", phoneNumber).Get(userData)
+	common.ErrorHandler(err_Get)
+
+	userData.IsDisable = "no"
+	userData.Token = common.GenerateSubId(24)
+	userData.Expire = time.Now().AddDate(0, 0, 30)
+
+	num, err_Update := conf.Engine.Where("phone_number=?", phoneNumber).Update(userData)
+	common.ErrorHandler(err_Update)
+	if num < 0 {
+		log.Panicln("用户不存在")
+	}
+
+	return *userData, nil
 }

@@ -26,4 +26,19 @@ declare interface MyFile {
 
 }
 
+declare interface User {
+    phoneNumber: string
+    userName: string
+    token: string
+    expire: string
+    unique: string
+    isDisable: string
+}
+
+declare interface HttpResponse {
+    data: object
+    msg: string
+    success: boolean
+}
+
 declare module 'vue-countup-v2';

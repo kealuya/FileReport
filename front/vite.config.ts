@@ -34,10 +34,12 @@ export default ({command, mode}: ConfigEnv): UserConfigExport => {
 
     const {
         VITE_PORT,
-        VITE_PROXY_DOMAIN,// 一般都叫api，没用上
+        // 一般都叫api，没用上
+        VITE_PROXY_DOMAIN,
         VITE_PROXY_DOMAIN_REAL
     } = loadEnv(mode, root);
 
+    console.log(VITE_PROXY_DOMAIN_REAL);// 开发模式、生产模式
     return {
         build: {
             outDir: "../static/dist/",

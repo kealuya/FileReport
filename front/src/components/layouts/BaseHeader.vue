@@ -27,12 +27,22 @@
               <img style="width: 40px;height: 40px"
                    src="https://yyk-app.obs.cn-north-4.myhuaweicloud.com/15922124562-20220527165037315.gif">
               <div style="width: 10px"></div>
-              <div>欢迎访问文档发布系统</div>
+              <template v-if="userName==''">
+                <div>欢迎访问文档发布系统</div>
+              </template>
+              <template v-else>
+                <div>欢迎🍎🍓🥝🍅🍇{{ userName }}🍎🍓🥝🍅🍇</div>
+              </template>
             </el-row>
           </el-col>
         </el-row>
       </template>
-      <el-menu-item style="height: 60px;" @click="login" index="login">我是社内人员</el-menu-item>
+      <template v-if="userName==''">
+        <el-menu-item style="height: 60px;" @click="login" index="login">社内人员登录</el-menu-item>
+      </template>
+      <template v-else>
+        <el-menu-item style="height: 60px;" @click="logout">退出登录</el-menu-item>
+      </template>
     </el-sub-menu>
     <el-menu-item @click="toggleDark()">
       <button class="border-none w-full bg-transparent cursor-pointer" style="height: 60px;">
@@ -58,6 +68,10 @@
 <script lang="ts" setup>
 import {toggleDark} from '~/composables';
 import {ref, watchEffect} from 'vue'
+import {useUserStore} from "~/stores";
+import {storeToRefs} from "pinia";
+
+const {userName} = storeToRefs(useUserStore())
 
 const activeIndex = ref('1')
 const handleSelect = (key: string, keyPath: string[]) => {
@@ -78,6 +92,11 @@ const searchHandle = () => {
 const isShowLoginModal = ref(false)
 const login = () => {
   isShowLoginModal.value = !isShowLoginModal.value
+}
+
+const logout = () => {
+  useUserStore().logout()
+  window.location.reload()
 }
 
 
