@@ -4,24 +4,26 @@
   <div style="margin: 15px 0px 15px 0px">
     <StateCard/>
   </div>
+  <div style="display: flex;justify-content: center">
+    <div class="project">
+      <template v-for="item in projectList">
+        <el-card style="margin: 10px" :body-style="{ padding: '20px',width:'200px'  }" shadow="hover"
+                 @click="gotoDetail">
+          <img style="width: 100%"
+               src="https://yyk-app.obs.cn-north-4.myhuaweicloud.com/yyk_szht1949_1653543339403024.jpg"
 
-  <div class="project">
-    <template v-for="item in projectList">
-      <el-card style="margin: 10px" :body-style="{ padding: '20px',width:'200px'  }" shadow="hover" @click="gotoDetail">
-        <img style="width: 100%"
-             src="https://yyk-app.obs.cn-north-4.myhuaweicloud.com/yyk_szht1949_1653543339403024.jpg"
-
-        />
-        <div style="padding: 14px">
-          <span style="font-size: 24px">{{ item.projectName }}</span>
-          <div class="bottom">
-            <div style="font-size: 12px;color: gray;">
-              {{ item.updateDate }}
+          />
+          <div style="padding: 14px">
+            <span style="font-size: 24px">{{ item.projectName }}</span>
+            <div class="bottom">
+              <div style="font-size: 12px;color: gray;">
+                {{ item.updateDate }}
+              </div>
             </div>
           </div>
-        </div>
-      </el-card>
-    </template>
+        </el-card>
+      </template>
+    </div>
   </div>
   <div class="table">
     <div style="flex:10;">
@@ -185,16 +187,15 @@ const projectActiveData = reactive<Array<{ projectName: string, releaseCount: st
 )
 
 
-
 </script>
 
 
 <style>
 .project {
   margin: 15px 0px 15px 0px;
-  width: 100%;
+  width: 1400px;
   display: flex;
-  justify-content: center;
+  justify-content: start;
   flex-flow: wrap;
 }
 
