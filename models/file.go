@@ -2,6 +2,7 @@ package models
 
 import (
 	"FileReport/common"
+	"FileReport/conf"
 	"FileReport/db"
 	"FileReport/entity"
 	"github.com/beego/beego/v2/client/orm"
@@ -168,7 +169,7 @@ func AuthorityFile(filename, productname, userid string, IsOwnerEdit, IsRelease 
 	return "success", nil
 }
 
-func Upload(filename, productname, ismajor, userid string) (result string, resultErr error) {
+/*func Upload(filename, productname, ismajor, userid string) (result string, resultErr error) {
 	o := orm.NewOrm()
 	to, err := o.Begin()
 	defer common.RecoverHandler(func(rcErr error) {
@@ -223,7 +224,7 @@ func Upload(filename, productname, ismajor, userid string) (result string, resul
 	_ = to.Commit()
 	return "success", nil
 
-}
+}*/
 func GetCurrentHeader() (result []entity.ProductStatus, resultErr error) {
 	defer common.RecoverHandler(func(rcErr error) {
 
@@ -245,4 +246,83 @@ func GetLatestTrend() (result []entity.FileRecord, resultErr error) {
 
 	return productlist, nil
 
+}
+func Upload(docinfo entity.Doc, fileinfo entity.File) (result string, resultErr error) {
+
+	common.RecoverHandler(func(err error) {
+		result = "false"
+		resultErr = err
+		return
+	})
+
+	doc := new(entity.Doc)
+	doc.IsRelease = docinfo.IsRelease
+	doc.IsOwnerEdit = docinfo.IsOwnerEdit
+	doc.DocName = docinfo.DocName
+	doc.DocType = docinfo.DocType
+	doc.IsDiscard = docinfo.IsDiscard
+	doc.OwnerId = docinfo.OwnerId
+	doc.CreateDate = time.Now()
+	doc.ProId = docinfo.ProId
+
+	file := new(entity.File)
+	file.FileName = fileinfo.FileName
+	file.Version = fileinfo.Version
+	file.VersionShow = fileinfo.VersionShow
+	file.UpdateDate = time.Now()
+	file.UpdateUserId = fileinfo.UpdateUserId
+	file.UpdateContent = fileinfo.UpdateContent
+	_, err_Insert := conf.Engine.Insert(doc, file)
+	common.ErrorHandler(err_Insert)
+
+	return "success", nil
+}
+func FileAuthority(docinfo entity.Doc) (result string, resultErr error) {
+
+	common.RecoverHandler(func(err error) {
+		result = "false"
+		resultErr = err
+		return
+	})
+
+	doc := new(entity.Doc)
+	doc.IsRelease = docinfo.IsRelease
+	doc.IsOwnerEdit = docinfo.IsOwnerEdit
+	doc.DocName = docinfo.DocName
+	doc.DocType = docinfo.DocType
+	doc.IsDiscard = docinfo.IsDiscard
+	doc.OwnerId = docinfo.OwnerId
+	doc.CreateDate = time.Now()
+	doc.ProId = docinfo.ProId
+
+	_, err_Insert := conf.Engine.Where("doc_id=?", 2).Update(doc)
+	common.ErrorHandler(err_Insert)
+
+	return "success", nil
+}
+
+type DocFile struct {
+	entity.Doc    `xorm:"extends"`
+	Version       int       `xorm:"not null integer" json:"version,omitempty"`
+	VersionShow   string    `xorm:"TEXT" json:"versionShow,omitempty"`
+	UpdateDate    time.Time `xorm:"DATE" json:"updateDate"`
+	UpdateUserId  string    `xorm:"text" json:"updateUserId,omitempty"`
+	UpdateContent string    `xorm:"text" json:"updateContent,omitempty"`
+	FileName      string    `xorm:"TEXT" json:"fileName,omitempty"`
+}
+
+func MyFile() (result []DocFile, resultErr error) {
+
+	common.RecoverHandler(func(err error) {
+		result = []DocFile{}
+		resultErr = err
+		return
+	})
+
+	docfile := new([]DocFile)
+
+	err_Select := conf.Engine.Table("doc").Join("INNER", "file", "file.doc_id=doc.doc_id").Find(docfile)
+	common.ErrorHandler(err_Select)
+
+	return *docfile, nil
 }

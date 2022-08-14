@@ -12,9 +12,9 @@ func init() {
 			beego.NSNamespace("/file",
 				beego.NSRouter("/getCurrentHeader", &controllers.FlieController{}, "post:GetCurrentHeader"),
 			),
-			beego.NSNamespace("/file",
-				beego.NSRouter("/uploadFile", &controllers.FlieController{}, "post:UploadFile"),
-			),
+			//beego.NSNamespace("/file",
+			//	beego.NSRouter("/uploadFile", &controllers.FlieController{}, "post:UploadFile"),
+			//),
 			beego.NSNamespace("/file",
 				beego.NSRouter("/updateFile", &controllers.FlieController{}, "post:UpdateFile"),
 			),
@@ -24,6 +24,9 @@ func init() {
 			beego.NSNamespace("/file",
 				beego.NSRouter("/abolishFile", &controllers.FlieController{}, "post:AbolishFile"),
 			),
+			//beego.NSNamespace("/file",
+			//	beego.NSRouter("/authorityFile", &controllers.FlieController{}, "post:AuthorityFile"),
+			//),
 			beego.NSNamespace("/file",
 				beego.NSRouter("/getProductHeader", &controllers.FlieController{}, "post:GetProductHeader"),
 			),
@@ -48,6 +51,9 @@ func init() {
 			// =========================
 			beego.NSRouter("/getCaptcha", &controllers.UserController{}, "post:GetCaptcha"),
 			beego.NSRouter("/loginFr", &controllers.UserController{}, "post:LoginFr"),
+			beego.NSRouter("/uploadFile", &controllers.FlieController{}, "post:UploadFile"),
+			beego.NSRouter("/fileAuthority", &controllers.FlieController{}, "post:FileAuthority"),
+			beego.NSRouter("/myFile", &controllers.FlieController{}, "post:MyFile"),
 		)
 	beego.AddNamespace(namespace)
 

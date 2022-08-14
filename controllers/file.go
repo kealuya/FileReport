@@ -2,11 +2,13 @@ package controllers
 
 import (
 	"FileReport/common"
+	"FileReport/entity"
 	"FileReport/models"
 	"encoding/json"
 	"fmt"
 	"github.com/beego/beego/v2/core/logs"
 	beego "github.com/beego/beego/v2/server/web"
+	"time"
 )
 
 type FlieController struct {
@@ -62,7 +64,8 @@ func (fCtrl *FlieController) GetRecentUpdate() {
 	}
 	resJson.Data = filelist
 }
-func (fCtrl *FlieController) UploadFile() {
+
+/*func (fCtrl *FlieController) UploadFile() {
 	resJson := NewJsonStruct(nil)
 	defer func() {
 		fCtrl.Data["json"] = resJson
@@ -91,7 +94,7 @@ func (fCtrl *FlieController) UploadFile() {
 	}
 	resJson.Data = result
 
-}
+}*/
 func (fCtrl *FlieController) AbolishFile() {
 	resJson := NewJsonStruct(nil)
 	defer func() {
@@ -237,4 +240,111 @@ func (fCtrl *FlieController) GetActiveProduct() {
 	}()
 
 	resJson.Data = "该接口需要明确是要咋处理再实现"
+}
+func (uCtrl *FlieController) UploadFile() {
+
+	resJson := NewJsonStruct(nil)
+	defer func() {
+		uCtrl.Data["json"] = resJson
+		uCtrl.ServeJSON()
+	}()
+	doc := entity.Doc{}
+	doc.IsRelease = "false"
+	doc.IsOwnerEdit = "false"
+	doc.DocName = "文档"
+	doc.DocType = "ppt"
+	doc.IsDiscard = "false"
+	doc.OwnerId = "155"
+	doc.CreateDate = time.Now()
+	doc.ProId = 2
+
+	file := entity.File{}
+	file.FileName = "文件"
+	file.Version = 2
+	file.VersionShow = "v1.01"
+	file.UpdateDate = time.Now()
+	file.UpdateUserId = "155"
+	file.UpdateContent = "初始化"
+
+	//res := uCtrl.Ctx.Input.RequestBody
+	/*	err_Unmarshal := json.Unmarshal(res, &phoneInfo)
+		if err_Unmarshal != nil {
+			resJson.Success = false
+			resJson.Msg = fmt.Sprintf("系统错误 : %s", err_Unmarshal.Error())
+			logs.Error(err_Unmarshal, string(res))
+			return
+		}*/
+	// 判断是否是既存用户
+	_, err_Upload := models.Upload(doc, file)
+
+	if err_Upload != nil {
+		resJson.Success = false
+		resJson.Msg = fmt.Sprintf("系统错误 : %s", err_Upload.Error())
+		logs.Error(err_Upload)
+		return
+	}
+
+}
+func (uCtrl *FlieController) FileAuthority() {
+
+	resJson := NewJsonStruct(nil)
+	defer func() {
+		uCtrl.Data["json"] = resJson
+		uCtrl.ServeJSON()
+	}()
+	doc := entity.Doc{}
+	doc.IsRelease = "false"
+	doc.IsOwnerEdit = "false"
+	doc.DocName = "文档"
+	doc.DocType = "ppt"
+	doc.IsDiscard = "true"
+	doc.OwnerId = "155"
+	doc.CreateDate = time.Now()
+	doc.ProId = 2
+
+	//res := uCtrl.Ctx.Input.RequestBody
+	/*	err_Unmarshal := json.Unmarshal(res, &phoneInfo)
+		if err_Unmarshal != nil {
+			resJson.Success = false
+			resJson.Msg = fmt.Sprintf("系统错误 : %s", err_Unmarshal.Error())
+			logs.Error(err_Unmarshal, string(res))
+			return
+		}*/
+	// 判断是否是既存用户
+	_, err_Authority := models.FileAuthority(doc)
+
+	if err_Authority != nil {
+		resJson.Success = false
+		resJson.Msg = fmt.Sprintf("系统错误 : %s", err_Authority.Error())
+		logs.Error(err_Authority)
+		return
+	}
+
+}
+func (uCtrl *FlieController) MyFile() {
+
+	resJson := NewJsonStruct(nil)
+	defer func() {
+		uCtrl.Data["json"] = resJson
+		uCtrl.ServeJSON()
+	}()
+
+	//res := uCtrl.Ctx.Input.RequestBody
+	/*	err_Unmarshal := json.Unmarshal(res, &phoneInfo)
+		if err_Unmarshal != nil {
+			resJson.Success = false
+			resJson.Msg = fmt.Sprintf("系统错误 : %s", err_Unmarshal.Error())
+			logs.Error(err_Unmarshal, string(res))
+			return
+		}*/
+	// 判断是否是既存用户
+	result, err_MyFile := models.MyFile()
+
+	if err_MyFile != nil {
+		resJson.Success = false
+		resJson.Msg = fmt.Sprintf("系统错误 : %s", err_MyFile.Error())
+		logs.Error(err_MyFile)
+		return
+	}
+	resJson.Data = result
 }

@@ -1,13 +1,12 @@
 package models
 
 import (
-	"FileReport/db/handler"
 	_ "github.com/mattn/go-sqlite3"
 )
 
-func init() {
+/*func init() {
 	handler.RegisterDB()
-}
+}*/
 
 /*func Test() (entity.FileInfo, error) {
 	o := orm.NewOrm()
