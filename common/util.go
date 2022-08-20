@@ -47,10 +47,16 @@ func ErrorHandler(err error, info ...interface{}) {
 	}
 }
 
-//String转Int8
+//String转Int64
 func StringToInt64(str string) int64 {
 	n, _ := strconv.ParseInt(str, 10, 8)
 	return n
+}
+
+//Int64转String
+func Int64ToString(str int64) string {
+	i := strconv.FormatInt(str, 10)
+	return i
 }
 
 const (

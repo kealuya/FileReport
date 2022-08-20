@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"FileReport/common"
 	"FileReport/entity"
 	"FileReport/models"
 	"encoding/json"
@@ -182,7 +181,7 @@ func (fCtrl *FlieController) AuthorityFile() {
 
 }
 
-func (fCtrl *FlieController) UpdateFile() {
+/*func (fCtrl *FlieController) UpdateFile() {
 	resJson := NewJsonStruct(nil)
 	defer func() {
 		fCtrl.Data["json"] = resJson
@@ -214,7 +213,7 @@ func (fCtrl *FlieController) UpdateFile() {
 	}
 	resJson.Data = result
 
-}
+}*/
 func (fCtrl *FlieController) GetLatestTrend() {
 	resJson := NewJsonStruct(nil)
 	defer func() {
@@ -347,4 +346,41 @@ func (uCtrl *FlieController) MyFile() {
 		return
 	}
 	resJson.Data = result
+}
+func (uCtrl *FlieController) UpdateFile() {
+
+	resJson := NewJsonStruct(nil)
+	defer func() {
+		uCtrl.Data["json"] = resJson
+		uCtrl.ServeJSON()
+	}()
+	doc := entity.Doc{}
+
+	file := entity.File{}
+	file.DocId = 8
+	file.FileName = "文件"
+	file.Version = 2
+	file.VersionShow = "v1.01"
+	file.UpdateDate = time.Now()
+	file.UpdateUserId = "155"
+	file.UpdateContent = "更新"
+
+	//res := uCtrl.Ctx.Input.RequestBody
+	/*	err_Unmarshal := json.Unmarshal(res, &phoneInfo)
+		if err_Unmarshal != nil {
+			resJson.Success = false
+			resJson.Msg = fmt.Sprintf("系统错误 : %s", err_Unmarshal.Error())
+			logs.Error(err_Unmarshal, string(res))
+			return
+		}*/
+	// 判断是否是既存用户
+	_, err_UpdateFile := models.UpdateFile(doc, file)
+
+	if err_UpdateFile != nil {
+		resJson.Success = false
+		resJson.Msg = fmt.Sprintf("系统错误 : %s", err_UpdateFile.Error())
+		logs.Error(err_UpdateFile)
+		return
+	}
+
 }

@@ -15,9 +15,9 @@ func init() {
 			//beego.NSNamespace("/file",
 			//	beego.NSRouter("/uploadFile", &controllers.FlieController{}, "post:UploadFile"),
 			//),
-			beego.NSNamespace("/file",
-				beego.NSRouter("/updateFile", &controllers.FlieController{}, "post:UpdateFile"),
-			),
+			//beego.NSNamespace("/file",
+			//	beego.NSRouter("/updateFile", &controllers.FlieController{}, "post:UpdateFile"),
+			//),
 			beego.NSNamespace("/file",
 				beego.NSRouter("/publishFile", &controllers.FlieController{}, "post:PublishFile"),
 			),
@@ -54,6 +54,7 @@ func init() {
 			beego.NSRouter("/uploadFile", &controllers.FlieController{}, "post:UploadFile"),
 			beego.NSRouter("/fileAuthority", &controllers.FlieController{}, "post:FileAuthority"),
 			beego.NSRouter("/myFile", &controllers.FlieController{}, "post:MyFile"),
+			beego.NSRouter("/updateFile", &controllers.FlieController{}, "post:UpdateFile"),
 		)
 	beego.AddNamespace(namespace)
 

@@ -34,7 +34,7 @@ func GetRecentUpdate() (result []entity.FileRecord, resultErr error) {
 	return productlist, nil
 }
 
-func UpdateFile(filename, productname, userid string, ma, mi int64) (result string, resultErr error) {
+/*func UpdateFile(filename, productname, userid string, ma, mi int64) (result string, resultErr error) {
 	o := orm.NewOrm()
 	to, err := o.Begin()
 	defer common.RecoverHandler(func(rcErr error) {
@@ -65,7 +65,7 @@ func UpdateFile(filename, productname, userid string, ma, mi int64) (result stri
 	_ = to.Commit()
 
 	return "sucess", nil
-}
+}*/
 
 func AbolishFile(filename, productname, userid string) (result string, resultErr error) {
 	o := orm.NewOrm()
@@ -248,13 +248,19 @@ func GetLatestTrend() (result []entity.FileRecord, resultErr error) {
 
 }
 func Upload(docinfo entity.Doc, fileinfo entity.File) (result string, resultErr error) {
-
-	common.RecoverHandler(func(err error) {
+	session := conf.Engine.NewSession()
+	defer common.RecoverHandler(func(err error) {
+		session.Rollback()
 		result = "false"
 		resultErr = err
 		return
 	})
 
+	defer session.Close()
+	// add Begin() before any action
+	if err_Session := session.Begin(); err_Session != nil {
+		common.ErrorHandler(err_Session)
+	}
 	doc := new(entity.Doc)
 	doc.IsRelease = docinfo.IsRelease
 	doc.IsOwnerEdit = docinfo.IsOwnerEdit
@@ -264,17 +270,19 @@ func Upload(docinfo entity.Doc, fileinfo entity.File) (result string, resultErr 
 	doc.OwnerId = docinfo.OwnerId
 	doc.CreateDate = time.Now()
 	doc.ProId = docinfo.ProId
-
+	_, err_InsertDoc := session.Insert(doc)
+	common.ErrorHandler(err_InsertDoc)
 	file := new(entity.File)
+	file.DocId = doc.DocId
 	file.FileName = fileinfo.FileName
 	file.Version = fileinfo.Version
 	file.VersionShow = fileinfo.VersionShow
 	file.UpdateDate = time.Now()
 	file.UpdateUserId = fileinfo.UpdateUserId
 	file.UpdateContent = fileinfo.UpdateContent
-	_, err_Insert := conf.Engine.Insert(doc, file)
-	common.ErrorHandler(err_Insert)
-
+	_, err_InsertFile := session.Insert(file)
+	common.ErrorHandler(err_InsertFile)
+	session.Commit()
 	return "success", nil
 }
 func FileAuthority(docinfo entity.Doc) (result string, resultErr error) {
@@ -325,4 +333,31 @@ func MyFile() (result []DocFile, resultErr error) {
 	common.ErrorHandler(err_Select)
 
 	return *docfile, nil
+}
+func UpdateFile(docinfo entity.Doc, fileinfo entity.File) (result string, resultErr error) {
+	session := conf.Engine.NewSession()
+	defer common.RecoverHandler(func(err error) {
+		session.Rollback()
+		result = "false"
+		resultErr = err
+		return
+	})
+
+	defer session.Close()
+	// add Begin() before any action
+	if err_Session := session.Begin(); err_Session != nil {
+		common.ErrorHandler(err_Session)
+	}
+	file := new(entity.File)
+	file.DocId = fileinfo.DocId
+	file.FileName = fileinfo.FileName
+	file.Version = fileinfo.Version
+	file.VersionShow = fileinfo.VersionShow
+	file.UpdateDate = time.Now()
+	file.UpdateUserId = fileinfo.UpdateUserId
+	file.UpdateContent = fileinfo.UpdateContent
+	_, err_InsertFile := session.Insert(file)
+	common.ErrorHandler(err_InsertFile)
+	session.Commit()
+	return "success", nil
 }
