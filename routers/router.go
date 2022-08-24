@@ -2,13 +2,32 @@ package routers
 
 import (
 	"FileReport/controllers"
+	"FileReport/models"
 	beego "github.com/beego/beego/v2/server/web"
+	"github.com/beego/beego/v2/server/web/context"
 )
+
+var AuthFilter = func(ctx *context.Context) {
+	println("进拦截器")
+	token := ctx.Request.Header.Get("token")
+	if token != "" {
+		result := models.UserExist(token)
+		if result {
+
+		} else {
+			ctx.ResponseWriter.Write([]byte("不存在改成员，或改成员已失效"))
+		}
+	} else {
+		ctx.ResponseWriter.Write([]byte("没token"))
+	}
+	// 权限验证过滤器内容
+}
 
 func init() {
 
 	namespace :=
 		beego.NewNamespace("/v1",
+			//beego.NSBefore(AuthFilter),//拦截器，暂时关闭
 			beego.NSNamespace("/file",
 				beego.NSRouter("/getCurrentHeader", &controllers.FlieController{}, "post:GetCurrentHeader"),
 			),
