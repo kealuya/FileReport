@@ -28,12 +28,6 @@ type FileInfo struct {
 	ModifyTime   string `orm:"null"`
 	Modifier     string `orm:"null"`
 }
-type ProductStatus struct {
-	ProductName  string //项目名称
-	FileNumber   int32  //文件数量
-	PersonNumber int32  //维护人数
-	VersionCount int32  //发布次数
-}
 
 type ProductInfo struct {
 	Id             int64

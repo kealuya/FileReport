@@ -4,6 +4,7 @@ import (
 	"FileReport/common"
 	"FileReport/conf"
 	"FileReport/db"
+	"FileReport/db/handler"
 	"FileReport/entity"
 	"github.com/beego/beego/v2/client/orm"
 	"time"
@@ -225,7 +226,7 @@ func AuthorityFile(filename, productname, userid string, IsOwnerEdit, IsRelease 
 	return "success", nil
 
 }*/
-func GetCurrentHeader() (result []entity.ProductStatus, resultErr error) {
+/*func GetCurrentHeader() (result []entity.ProductStatus, resultErr error) {
 	defer common.RecoverHandler(func(rcErr error) {
 
 		result = []entity.ProductStatus{}
@@ -235,7 +236,7 @@ func GetCurrentHeader() (result []entity.ProductStatus, resultErr error) {
 
 	return productlist, nil
 
-}
+}*/
 func GetLatestTrend() (result []entity.FileRecord, resultErr error) {
 	defer common.RecoverHandler(func(rcErr error) {
 		result = []entity.FileRecord{}
@@ -360,4 +361,29 @@ func UpdateFile(docinfo entity.Doc, fileinfo entity.File) (result string, result
 	common.ErrorHandler(err_InsertFile)
 	session.Commit()
 	return "success", nil
+}
+
+type ProductStatus struct {
+	ProId    int    //项目id
+	ProName  string //项目名称
+	ProLogo  string //项目图标
+	DocNums  int    //文件数量
+	PeoNums  int    //维护人数
+	Versions int    //发布次数
+}
+
+func GetCurrentHeader() (result []ProductStatus, resultErr error) {
+
+	common.RecoverHandler(func(err error) {
+		result = []ProductStatus{}
+		resultErr = err
+		return
+	})
+
+	productStatus := new([]ProductStatus)
+
+	err_Select := conf.Engine.SQL(handler.Select_Current_Header).Find(productStatus)
+	common.ErrorHandler(err_Select)
+
+	return *productStatus, nil
 }

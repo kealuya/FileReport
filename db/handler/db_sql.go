@@ -1,6 +1,18 @@
 package handler
 
 const (
+	Select_Current_Header = `SELECT
+								p.*,
+								COUNT( DISTINCT d.doc_id ) AS doc_nums,
+								count( DISTINCT f.update_user_id ) AS peo_nums,
+								COUNT( f.update_date ) AS versions 
+							FROM
+								"Project" p
+								LEFT JOIN Doc d ON d.pro_id = p.pro_id
+								LEFT JOIN File f ON f.doc_id = d.doc_id 
+							GROUP BY
+								p.pro_id`
+
 	Select_User = `SELECT * FROM user_info WHERE userid = ? `
 
 	Update_User = `Update user_info SET user_role = ?,password = ? , modifier = ? , modify_time = ? WHERE userid = ? `
@@ -10,9 +22,6 @@ const (
 	Update_Product_info = `UPDATE product_info SET last_creater = ?,last_update_time=? WHERE product_name=?`
 
 	Update_File = `UPDATE file_info SET major_version=?,minor_version=? , modifier = ? , modify_time = ? WHERE file_name = ? AND product_name = ?`
-
-	Select_Current_Header = `SELECT product_name, COUNT( DISTINCT file_name ) AS file_number, COUNT( DISTINCT creater ) AS person_number, COUNT( * ) AS version_count
-							FROM file_record  GROUP BY product_name`
 
 	Select_Latest_Trend = `SELECT *  FROM file_record  `
 

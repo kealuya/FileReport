@@ -104,16 +104,16 @@ func InsertOrUpdateFile(to orm.TxOrmer, fileinfo entity.FileInfo) bool {
 	return true
 }
 
-func GetCurrentHeader() []entity.ProductStatus {
-	o := orm.NewOrm()
-	var productInfo []entity.ProductStatus
-	nums, err := o.Raw(handler.Select_Current_Header).QueryRows(&productInfo)
-	common.ErrorHandler(err, "从数据库获取当前状态header信息失败")
-	if nums < 1 {
-		common.ErrorHandler(errors.New("不存在此文件更新记录"), "从数据库获取当前状态header信息失败")
-	}
-	return productInfo
-}
+//func GetCurrentHeader() []entity.ProductStatus {
+//	o := orm.NewOrm()
+//	var productInfo []entity.ProductStatus
+//	nums, err := o.Raw(handler.Select_Current_Header).QueryRows(&productInfo)
+//	common.ErrorHandler(err, "从数据库获取当前状态header信息失败")
+//	if nums < 1 {
+//		common.ErrorHandler(errors.New("不存在此文件更新记录"), "从数据库获取当前状态header信息失败")
+//	}
+//	return productInfo
+//}
 func GetLatestTrend() []entity.FileRecord {
 	o := orm.NewOrm()
 	var productInfo []entity.FileRecord
