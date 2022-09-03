@@ -1,6 +1,7 @@
 package routers
 
 import (
+	"FileReport/conf"
 	"FileReport/controllers"
 	"FileReport/models"
 	beego "github.com/beego/beego/v2/server/web"
@@ -24,6 +25,9 @@ var AuthFilter = func(ctx *context.Context) {
 }
 
 func init() {
+	// beego log、db、缓存 初始化
+	// 如果在main方法中通过init方式执行，log会不起作用，故明确调用
+	conf.InitConf()
 
 	namespace :=
 		beego.NewNamespace("/v1",
