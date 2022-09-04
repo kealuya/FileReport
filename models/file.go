@@ -16,15 +16,6 @@ type FileResult struct {
 	Data    interface{} `json:"data"`
 }
 
-func GetProductHeader() (result []entity.ProductInfo, resultErr error) {
-
-	defer common.RecoverHandler(func(rcErr error) {
-		result = []entity.ProductInfo{}
-		resultErr = rcErr
-	})
-	productlist := db.GetProductHeader()
-	return productlist, nil
-}
 func GetRecentUpdate() (result []entity.FileRecord, resultErr error) {
 	defer common.RecoverHandler(func(rcErr error) {
 
@@ -34,40 +25,6 @@ func GetRecentUpdate() (result []entity.FileRecord, resultErr error) {
 
 	return productlist, nil
 }
-
-/*func UpdateFile(filename, productname, userid string, ma, mi int64) (result string, resultErr error) {
-	o := orm.NewOrm()
-	to, err := o.Begin()
-	defer common.RecoverHandler(func(rcErr error) {
-		to.Rollback()
-		result = "fail"
-		resultErr = rcErr
-	})
-
-	if err != nil {
-		panic("****UpdateFile****start the transaction failed")
-	}
-	timenow := time.Now().Format("2006-01-02 15:04:05")
-	record := db.SelectFileInfo(filename, productname)
-
-	record.Modifier = userid
-	record.ModifyTime = timenow
-	record.MinorVersion = ma
-	record.MinorVersion = mi
-	_ = db.UpdateFile(to, record)
-
-	record.Operationtype = "update"
-	record.CreateTime = timenow
-	record.Creater = userid
-	record.Modifier = userid
-	record.ModifyTime = timenow
-	_ = db.Record(to, record)
-
-	_ = to.Commit()
-
-	return "sucess", nil
-}*/
-
 func AbolishFile(filename, productname, userid string) (result string, resultErr error) {
 	o := orm.NewOrm()
 	to, err := o.Begin()
@@ -169,74 +126,6 @@ func AuthorityFile(filename, productname, userid string, IsOwnerEdit, IsRelease 
 	_ = to.Commit()
 	return "success", nil
 }
-
-/*func Upload(filename, productname, ismajor, userid string) (result string, resultErr error) {
-	o := orm.NewOrm()
-	to, err := o.Begin()
-	defer common.RecoverHandler(func(rcErr error) {
-		to.Rollback()
-		result = "fail"
-		resultErr = rcErr
-	})
-	if err != nil {
-		panic("****PublishFile****start the transaction failed")
-	}
-	product := db.GetProductInfo(productname)
-
-	timenow := time.Now().Format("2006-01-02 15:04:05")
-	product.ProductName = productname
-	product.LastCreater = userid
-	product.LastUpdateTime = timenow
-	_ = db.InsertOrUpdateProduct(to, product)
-	fileinfo := entity.FileInfo{}
-	record := db.SelectFileInfo(filename, productname)
-
-	major := int64(1)
-	minor := int64(1)
-	if fileinfo.FileName != "" {
-		if ismajor == "yes" {
-			major = record.MajorVersion + 1
-		} else {
-			major = record.MajorVersion
-			minor = record.MinorVersion + 1
-		}
-	}
-	fileinfo.FileName = filename
-	fileinfo.Creater = userid
-	fileinfo.MajorVersion = major
-	fileinfo.MinorVersion = minor
-	fileinfo.Modifier = userid
-	fileinfo.ProductName = productname
-	fileinfo.CreateTime = timenow
-	fileinfo.ModifyTime = timenow
-	_ = db.InsertOrUpdateFile(to, fileinfo)
-
-	record.FileName = filename
-	record.ProductName = productname
-	record.Operationtype = "upload"
-	record.MajorVersion = major
-	record.MinorVersion = minor
-	record.CreateTime = timenow
-	record.Creater = userid
-	record.Modifier = userid
-	record.ModifyTime = timenow
-	_ = db.Record(to, record)
-
-	_ = to.Commit()
-	return "success", nil
-
-}*/
-/*func GetCurrentHeader() (result []entity.ProductStatus, resultErr error) {
-	defer common.RecoverHandler(func(rcErr error) {
-
-		result = []entity.ProductStatus{}
-		resultErr = rcErr
-	})
-	productlist := db.GetCurrentHeader()
-
-	return productlist, nil
-
-}*/
 func GetLatestTrend() (result []entity.FileRecord, resultErr error) {
 	defer common.RecoverHandler(func(rcErr error) {
 		result = []entity.FileRecord{}
@@ -288,7 +177,7 @@ func Upload(docinfo entity.Doc, fileinfo entity.File) (result string, resultErr 
 }
 func FileAuthority(docinfo entity.Doc) (result string, resultErr error) {
 
-	common.RecoverHandler(func(err error) {
+	defer common.RecoverHandler(func(err error) {
 		result = "false"
 		resultErr = err
 		return
@@ -322,7 +211,7 @@ type DocFile struct {
 
 func MyFile() (result []DocFile, resultErr error) {
 
-	common.RecoverHandler(func(err error) {
+	defer common.RecoverHandler(func(err error) {
 		result = []DocFile{}
 		resultErr = err
 		return
@@ -374,7 +263,7 @@ type ProductStatus struct {
 
 func GetCurrentHeader() (result []ProductStatus, resultErr error) {
 
-	common.RecoverHandler(func(err error) {
+	defer common.RecoverHandler(func(err error) {
 		result = []ProductStatus{}
 		resultErr = err
 		return
@@ -386,4 +275,28 @@ func GetCurrentHeader() (result []ProductStatus, resultErr error) {
 	common.ErrorHandler(err_Select)
 
 	return *productStatus, nil
+}
+
+type ProjectHeader struct {
+	DocId        int
+	UpdateUserId string
+	UpdateDate   time.Time
+	UserName     string
+	ProName      string
+	ProId        int
+	PhoneNumber  string
+}
+
+func GetProductHeader() (result []ProjectHeader, resultErr error) {
+
+	defer common.RecoverHandler(func(rcErr error) {
+		result = []ProjectHeader{}
+		resultErr = rcErr
+	})
+	productheader := new([]ProjectHeader)
+
+	err_Select := conf.Engine.SQL(handler.Select_Product_Header).Find(productheader)
+	common.ErrorHandler(err_Select)
+
+	return *productheader, nil
 }
