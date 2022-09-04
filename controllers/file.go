@@ -14,39 +14,6 @@ type FlieController struct {
 	beego.Controller
 }
 
-func (fCtrl *FlieController) GetProductHeader() {
-	resJson := NewJsonStruct(nil)
-	defer func() {
-		fCtrl.Data["json"] = resJson
-		fCtrl.ServeJSON()
-
-	}()
-	result, err_Product := models.GetProductHeader()
-	if err_Product != nil {
-		resJson.Success = false
-		resJson.Msg = fmt.Sprintf("获取项目header失败 : %s", err_Product.Error())
-		logs.Error(err_Product)
-		return
-	}
-	resJson.Data = result
-}
-
-/*func (fCtrl *FlieController) GetCurrentHeader() {
-	resJson := NewJsonStruct(nil)
-	defer func() {
-		fCtrl.Data["json"] = resJson
-		fCtrl.ServeJSON()
-
-	}()
-	result, err_Header := models.GetCurrentHeader()
-	if err_Header != nil {
-		resJson.Success = false
-		resJson.Msg = fmt.Sprintf("获取当前header失败 : %s", err_Header.Error())
-		logs.Error(err_Header)
-		return
-	}
-	resJson.Data = result
-}*/
 func (fCtrl *FlieController) GetRecentUpdate() {
 	resJson := NewJsonStruct(nil)
 	defer func() {
@@ -64,37 +31,6 @@ func (fCtrl *FlieController) GetRecentUpdate() {
 	}
 	resJson.Data = filelist
 }
-
-/*func (fCtrl *FlieController) UploadFile() {
-	resJson := NewJsonStruct(nil)
-	defer func() {
-		fCtrl.Data["json"] = resJson
-		fCtrl.ServeJSON()
-	}()
-	uploadFileRequestKey := FileInfo{}
-	res := fCtrl.Ctx.Input.RequestBody
-	err_Unmarshal := json.Unmarshal(res, &uploadFileRequestKey)
-	if err_Unmarshal != nil {
-		resJson.Success = false
-		resJson.Msg = fmt.Sprintf("系统错误 : %s", err_Unmarshal.Error())
-		logs.Error(err_Unmarshal)
-		return
-	}
-
-	result, err_Upload := models.Upload(
-		uploadFileRequestKey.FlieName,
-		uploadFileRequestKey.ProductName,
-		uploadFileRequestKey.MajorUpdate,
-		uploadFileRequestKey.Userid)
-	if err_Upload != nil {
-		resJson.Success = false
-		resJson.Msg = fmt.Sprintf("上传文件失败 : %s", err_Upload.Error())
-		logs.Error(err_Upload)
-		return
-	}
-	resJson.Data = result
-
-}*/
 func (fCtrl *FlieController) AbolishFile() {
 	resJson := NewJsonStruct(nil)
 	defer func() {
@@ -182,39 +118,6 @@ func (fCtrl *FlieController) AuthorityFile() {
 
 }
 
-/*func (fCtrl *FlieController) UpdateFile() {
-	resJson := NewJsonStruct(nil)
-	defer func() {
-		fCtrl.Data["json"] = resJson
-		fCtrl.ServeJSON()
-	}()
-	updateFileRequestKey := FileInfo{}
-	res := fCtrl.Ctx.Input.RequestBody
-	err_Unmarshal := json.Unmarshal(res, &updateFileRequestKey)
-	if err_Unmarshal != nil {
-		resJson.Success = false
-		resJson.Msg = fmt.Sprintf("系统错误 : %s", err_Unmarshal.Error())
-		logs.Error(err_Unmarshal)
-		return
-	}
-	version := updateFileRequestKey.Version
-	major := common.StringToInt64(version[1:2])
-	minor := common.StringToInt64(version[3:5])
-	result, err_Update := models.UpdateFile(
-		updateFileRequestKey.FlieName,
-		updateFileRequestKey.ProductName,
-		updateFileRequestKey.Userid,
-		major,
-		minor)
-	if err_Update != nil {
-		resJson.Success = false
-		resJson.Msg = fmt.Sprintf("更新文件失败 : %s", err_Update.Error())
-		logs.Error(err_Update)
-		return
-	}
-	resJson.Data = result
-
-}*/
 func (fCtrl *FlieController) GetLatestTrend() {
 	resJson := NewJsonStruct(nil)
 	defer func() {
@@ -398,6 +301,22 @@ func (fCtrl *FlieController) GetCurrentHeader() {
 		resJson.Success = false
 		resJson.Msg = fmt.Sprintf("获取当前header失败 : %s", err_Header.Error())
 		logs.Error(err_Header)
+		return
+	}
+	resJson.Data = result
+}
+func (fCtrl *FlieController) GetProductHeader() {
+	resJson := NewJsonStruct(nil)
+	defer func() {
+		fCtrl.Data["json"] = resJson
+		fCtrl.ServeJSON()
+
+	}()
+	result, err_Product := models.GetProductHeader()
+	if err_Product != nil {
+		resJson.Success = false
+		resJson.Msg = fmt.Sprintf("获取项目header失败 : %s", err_Product.Error())
+		logs.Error(err_Product)
 		return
 	}
 	resJson.Data = result
