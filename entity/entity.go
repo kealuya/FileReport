@@ -12,15 +12,15 @@ https://gitea.com/xorm/reverse
 */
 
 type Doc struct {
-	DocId       int       `xorm:"not null pk autoincr INTEGER" json:"docId,omitempty"`
-	DocName     string    `xorm:"TEXT" json:"docName,omitempty"`
-	OwnerId     string    `xorm:"TEXT" json:"ownerId,omitempty"`
-	CreateDate  time.Time `xorm:"DATE" json:"createDate"`
-	DocType     string    `xorm:"TEXT" json:"docType,omitempty"`
-	IsRelease   string    `xorm:"TEXT" json:"isRelease,omitempty"`
-	IsOwnerEdit string    `xorm:"TEXT" json:"isOwnerEdit,omitempty"`
-	ProId       int       `xorm:"INTEGER" json:"proId,omitempty"`
-	IsDiscard   string    `xorm:"TEXT" json:"isDiscard,omitempty"`
+	DocId       int    `xorm:"not null pk autoincr INTEGER" json:"docId,omitempty"`
+	DocName     string `xorm:"TEXT" json:"docName,omitempty"`
+	OwnerId     string `xorm:"TEXT" json:"ownerId,omitempty"`
+	CreateDate  string `xorm:"DATE" json:"createDate"`
+	DocType     string `xorm:"TEXT" json:"docType,omitempty"`
+	IsRelease   string `xorm:"TEXT" json:"isRelease,omitempty"`
+	IsOwnerEdit string `xorm:"TEXT" json:"isOwnerEdit,omitempty"`
+	ProId       int    `xorm:"INTEGER" json:"proId,omitempty"`
+	IsDiscard   string `xorm:"TEXT" json:"isDiscard,omitempty"`
 }
 
 type File struct {

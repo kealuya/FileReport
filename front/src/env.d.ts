@@ -8,22 +8,21 @@ declare module "*.vue" {
 }
 
 
-declare interface MyFile {
-    id: string
+declare interface DocFile {
+    docId: string
     updateDate: string
     createDate: string
-    name: string
-    updateUser: string
+    docName: string
+    fileName: string // 是指存储到obs里file的名称
+    updateUser: string // 加工
     updateContent: string
-    version: string
-    //
-    isHandlerButtonShow?: boolean
-    fileType: string
+    versionShow: string
+    docType: string
     isRelease: false
-    isOwnerEdit: true
-    owner: string
+    isOwnerEdit: boolean
+    isDiscard: boolean
+    owner: string // 加工
     ownerId: string
-
 }
 
 declare interface User {

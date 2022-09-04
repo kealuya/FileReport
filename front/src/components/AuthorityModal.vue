@@ -36,7 +36,7 @@ import {computed, WritableComputedRef} from "vue";
 
 // ==============================================================================
 // 组件 v-modal 模式
-const props = defineProps<{ modelValue: boolean, item: MyFile }>();
+const props = defineProps<{ modelValue: boolean, item: DocFile }>();
 const emit = defineEmits<{
   (e: 'update:modelValue', v: boolean): void,
   (e: 'authoritySuccess'): void

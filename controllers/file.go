@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-type FlieController struct {
+type FileController struct {
 	beego.Controller
 }
 
@@ -59,7 +59,7 @@ func (fCtrl *FlieController) AbolishFile() {
 	resJson.Data = result
 
 }
-func (fCtrl *FlieController) PublishFile() {
+func (fCtrl *FileController) PublishFile() {
 	resJson := NewJsonStruct(nil)
 	defer func() {
 		fCtrl.Data["json"] = resJson
@@ -87,7 +87,7 @@ func (fCtrl *FlieController) PublishFile() {
 	resJson.Data = result
 
 }
-func (fCtrl *FlieController) AuthorityFile() {
+func (fCtrl *FileController) AuthorityFile() {
 	resJson := NewJsonStruct(nil)
 	defer func() {
 		fCtrl.Data["json"] = resJson
@@ -134,7 +134,7 @@ func (fCtrl *FlieController) GetLatestTrend() {
 	}
 	resJson.Data = result
 }
-func (fCtrl *FlieController) GetActiveProduct() {
+func (fCtrl *FileController) GetActiveProduct() {
 	resJson := NewJsonStruct(nil)
 	defer func() {
 		fCtrl.Data["json"] = resJson
@@ -144,7 +144,7 @@ func (fCtrl *FlieController) GetActiveProduct() {
 
 	resJson.Data = "该接口需要明确是要咋处理再实现"
 }
-func (uCtrl *FlieController) UploadFile() {
+func (uCtrl *FileController) UploadFile() {
 
 	resJson := NewJsonStruct(nil)
 	defer func() {
@@ -158,14 +158,12 @@ func (uCtrl *FlieController) UploadFile() {
 	doc.DocType = "ppt"
 	doc.IsDiscard = "false"
 	doc.OwnerId = "155"
-	doc.CreateDate = time.Now()
 	doc.ProId = 2
 
 	file := entity.File{}
 	file.FileName = "文件"
 	file.Version = 2
 	file.VersionShow = "v1.01"
-	file.UpdateDate = time.Now()
 	file.UpdateUserId = "155"
 	file.UpdateContent = "初始化"
 
@@ -188,7 +186,7 @@ func (uCtrl *FlieController) UploadFile() {
 	}
 
 }
-func (uCtrl *FlieController) FileAuthority() {
+func (uCtrl *FileController) FileAuthority() {
 
 	resJson := NewJsonStruct(nil)
 	defer func() {
@@ -202,7 +200,6 @@ func (uCtrl *FlieController) FileAuthority() {
 	doc.DocType = "ppt"
 	doc.IsDiscard = "true"
 	doc.OwnerId = "155"
-	doc.CreateDate = time.Now()
 	doc.ProId = 2
 
 	//res := uCtrl.Ctx.Input.RequestBody
@@ -224,7 +221,7 @@ func (uCtrl *FlieController) FileAuthority() {
 	}
 
 }
-func (uCtrl *FlieController) MyFile() {
+func (uCtrl *FileController) MyFile() {
 
 	resJson := NewJsonStruct(nil)
 	defer func() {
@@ -251,7 +248,7 @@ func (uCtrl *FlieController) MyFile() {
 	}
 	resJson.Data = result
 }
-func (uCtrl *FlieController) UpdateFile() {
+func (uCtrl *FileController) UpdateFile() {
 
 	resJson := NewJsonStruct(nil)
 	defer func() {
@@ -288,7 +285,7 @@ func (uCtrl *FlieController) UpdateFile() {
 	}
 
 }
-func (fCtrl *FlieController) GetCurrentHeader() {
+func (fCtrl *FileController) GetCurrentHeader() {
 
 	resJson := NewJsonStruct(nil)
 	defer func() {

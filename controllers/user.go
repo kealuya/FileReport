@@ -16,7 +16,7 @@ type UserController struct {
 }
 
 func (uCtrl *UserController) GetCaptcha() {
-
+	logs.Info("init GetCaptcha")
 	resJson := NewJsonStruct(nil)
 	defer func() {
 		uCtrl.Data["json"] = resJson

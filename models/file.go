@@ -158,7 +158,6 @@ func Upload(docinfo entity.Doc, fileinfo entity.File) (result string, resultErr 
 	doc.DocType = docinfo.DocType
 	doc.IsDiscard = docinfo.IsDiscard
 	doc.OwnerId = docinfo.OwnerId
-	doc.CreateDate = time.Now()
 	doc.ProId = docinfo.ProId
 	_, err_InsertDoc := session.Insert(doc)
 	common.ErrorHandler(err_InsertDoc)
@@ -190,7 +189,6 @@ func FileAuthority(docinfo entity.Doc) (result string, resultErr error) {
 	doc.DocType = docinfo.DocType
 	doc.IsDiscard = docinfo.IsDiscard
 	doc.OwnerId = docinfo.OwnerId
-	doc.CreateDate = time.Now()
 	doc.ProId = docinfo.ProId
 
 	_, err_Insert := conf.Engine.Where("doc_id=?", 2).Update(doc)

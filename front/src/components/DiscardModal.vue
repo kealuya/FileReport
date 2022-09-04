@@ -2,14 +2,14 @@
   <div>
     <el-dialog
         v-model="isDialogShow"
-        title="废弃文件"
+        title="废弃文档"
         width="40%"
     >
       <div>
         <span>你确定要废弃 </span><span style="font-weight: bold;color: #ec5c5c">{{ item.name }}({{ item.version }})</span><span> 吗?</span>
       </div>
       <div>
-        <span style="font-size: 12px;color: #706e6e">废弃文件后，文件不得发布、更新，他人不可见</span>
+        <span style="font-size: 12px;color: #706e6e">废弃文档后，文件不得发布、更新，他人不可见</span>
       </div>
       <template #footer>
         <span class="dialog-footer">
@@ -26,7 +26,7 @@ import {computed, WritableComputedRef} from "vue";
 
 // ==============================================================================
 // 组件 v-modal 模式
-const props = defineProps<{ modelValue: boolean, item: MyFile }>();
+const props = defineProps<{ modelValue: boolean, item: DocFile }>();
 const emit = defineEmits<{
   (e: 'update:modelValue', v: boolean): void,
   (e: 'discardSuccess'): void

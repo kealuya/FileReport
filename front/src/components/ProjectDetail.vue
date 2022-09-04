@@ -7,7 +7,7 @@
       <div style="display: flex;flex-direction: row;align-items: center;justify-content: space-between">
         <div style="  flex: 1">
           <el-table :data="headerData">
-            <el-table-column prop="name" label="名称" width="480"/>
+            <el-table-column prop="docName" label="名称" width="480"/>
             <el-table-column prop="updateDate" label="更新时间" width="180"/>
             <el-table-column prop="updateUser" label="更新人"/>
           </el-table>
@@ -51,7 +51,7 @@
       <el-table-column label="名称" sortable min-width="400">
         <template #default="scope">
           <div style="display: flex; align-items: center">
-            <span style="margin-left: 10px">{{ scope.row.name }}</span>
+            <span style="margin-left: 10px">{{ scope.row.docName }}</span>
           </div>
         </template>
       </el-table-column>
@@ -59,7 +59,7 @@
       <el-table-column label="版本" sortable min-width="100">
         <template #default="scope">
           <div style="display: flex; align-items: center">
-            <span style="margin-left: 10px">{{ scope.row.version }}</span>
+            <span style="margin-left: 10px">{{ scope.row.versionShow }}</span>
             <template v-if="scope.row.isRelease===true">
               <div class="release">
                 发布
@@ -114,7 +114,7 @@
               <el-dropdown-menu>
                 <el-dropdown-item @click="fileUpdate(UPLOAD_MODAL_MODE.UPLOAD,scope.row)">更新上传</el-dropdown-item>
                 <el-dropdown-item @click="fileAuthority(scope.row)">权限调整</el-dropdown-item>
-                <el-dropdown-item @click="fileDiscard(scope.row)">废弃文件</el-dropdown-item>
+                <el-dropdown-item @click="fileDiscard(scope.row)">废弃文档</el-dropdown-item>
                 <el-dropdown-item @click="fileHistory">版本历史</el-dropdown-item>
               </el-dropdown-menu>
             </template>
@@ -165,19 +165,20 @@ const release = () => {
 
 }
 
-const tableData: MyFile[] = reactive(
+const tableData: DocFile[] = reactive(
     []
 )
 for (let i = 0; i < 15; i++) {
   tableData.push({
+    fileName: "", isDiscard: false,
     updateDate: '2016-05-03 12:32:55',
-    name: '浩天业财融合结算平台接口文档-v17(2)(1)111.docx',
+    docName: '浩天业财融合结算平台接口文档-v17(2)(1)111.docx',
     createDate: '2017-08-03 12:32:51',
     updateUser: '边宇辰',
-    version: 'v1.22',
-    fileType: "111",
+    versionShow: 'v1.22',
+    docType: "111",
     isRelease: false,
-    id: "",
+    docId: "",
     isOwnerEdit: true,
     owner: "张三",
     updateContent: "",
@@ -185,7 +186,7 @@ for (let i = 0; i < 15; i++) {
   })
 }
 
-const headerData: MyFile[] = reactive(
+const headerData: DocFile[] = reactive(
     []
 )
 
@@ -193,23 +194,25 @@ for (let i = 0; i < 3; i++) {
   headerData.push({
     ownerId: "",
     updateDate: '2016-05-03 12:32:55',
-    name: '浩天业财融合结算平台接口文档-v17(2)(1)111.docx',
+    docName: '浩天业财融合结算平台接口文档-v17(2)(1)111.docx',
     createDate: '2017-08-03 12:32:51',
     updateUser: '边宇辰',
-    version: 'v1.22',
-    fileType: 'word',
+    versionShow: 'v1.22',
+    docType: 'word',
     isRelease: false,
-    id: "",
+    docId: "",
     isOwnerEdit: true,
     owner: "张三",
-    updateContent: ""
+    updateContent: "",
+    fileName: "",
+    isDiscard: false
   })
 }
 
 const uploadModalDialogVisible = ref(false)
 const selectFile = ref({})
 const uploadModalMode = ref<UPLOAD_MODAL_MODE>()
-const fileUpdate = (type: UPLOAD_MODAL_MODE, item?: MyFile) => {
+const fileUpdate = (type: UPLOAD_MODAL_MODE, item?: DocFile) => {
   if (type == UPLOAD_MODAL_MODE.NEW) {
     selectFile.value = {}
     uploadModalMode.value = UPLOAD_MODAL_MODE.NEW
@@ -228,7 +231,7 @@ const discardSuccess = () => {
   console.log("删除")
 }
 const discardModalDialogVisible = ref(false)
-const fileDiscard = (item: MyFile) => {
+const fileDiscard = (item: DocFile) => {
   selectFile.value = item
   discardModalDialogVisible.value = true
 }
@@ -237,7 +240,7 @@ const authoritySuccess = () => {
   console.log("权限")
 }
 const authorityModalDialogVisible = ref(false)
-const fileAuthority = (item: MyFile) => {
+const fileAuthority = (item: DocFile) => {
   selectFile.value = item
   authorityModalDialogVisible.value = true
 }

@@ -29,7 +29,7 @@
     <div style="flex:10;">
       <h3>状态一览</h3>
       <el-table :data="projectNewStateData" size="large" style="width: 100%;height: 100%">
-        <el-table-column prop="fileName" label="文档"/>
+        <el-table-column prop="docName" label="文档"/>
         <el-table-column prop="updateContent" label="更新"/>
         <el-table-column prop="updateDate" label="时间"/>
         <el-table-column prop="fileVersion" label="版本"/>
