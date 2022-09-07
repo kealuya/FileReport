@@ -78,6 +78,21 @@ func (uCtrl *DocController) NewDoc() {
 	fmt.Println(docFile)
 
 	// todo file 处理
-
+	file := entity.File{
+		DocId:         t.New(docId).Int(),
+		Version:       1,
+		VersionShow:   docFile.VersionShow,
+		UpdateContent: "初始化",
+		UpdateUserId:  docFile.OwnerId,
+		UpdateDate:    common.FormatDate(time.Now(), common.YYYY_MM_DD_HH_MM_SS),
+		FileName:      docFile.FileName,
+	}
+	err_InsertFile := models.InsertFile(file)
+	if err_InsertFile != nil {
+		resJson.Success = false
+		resJson.Msg = fmt.Sprintf("系统错误 : %s", err_InsertFile.Error())
+		logs.Error(err_InsertFile, string(res))
+		return
+	}
 	return
 }

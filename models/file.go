@@ -166,7 +166,7 @@ func Upload(docinfo entity.Doc, fileinfo entity.File) (result string, resultErr 
 	file.FileName = fileinfo.FileName
 	file.Version = fileinfo.Version
 	file.VersionShow = fileinfo.VersionShow
-	file.UpdateDate = time.Now()
+	file.UpdateDate = common.FormatDate(time.Now(), common.YYYY_MM_DD_HH_MM_SS)
 	file.UpdateUserId = fileinfo.UpdateUserId
 	file.UpdateContent = fileinfo.UpdateContent
 	_, err_InsertFile := session.Insert(file)
@@ -241,7 +241,7 @@ func UpdateFile(docinfo entity.Doc, fileinfo entity.File) (result string, result
 	file.FileName = fileinfo.FileName
 	file.Version = fileinfo.Version
 	file.VersionShow = fileinfo.VersionShow
-	file.UpdateDate = time.Now()
+	file.UpdateDate = common.FormatDate(time.Now(), common.YYYY_MM_DD_HH_MM_SS)
 	file.UpdateUserId = fileinfo.UpdateUserId
 	file.UpdateContent = fileinfo.UpdateContent
 	_, err_InsertFile := session.Insert(file)

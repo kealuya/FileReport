@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"FileReport/common"
 	"FileReport/entity"
 	"FileReport/models"
 	"encoding/json"
@@ -14,7 +15,7 @@ type FileController struct {
 	beego.Controller
 }
 
-func (fCtrl *FlieController) GetRecentUpdate() {
+func (fCtrl *FileController) GetRecentUpdate() {
 	resJson := NewJsonStruct(nil)
 	defer func() {
 		fCtrl.Data["json"] = resJson
@@ -31,7 +32,7 @@ func (fCtrl *FlieController) GetRecentUpdate() {
 	}
 	resJson.Data = filelist
 }
-func (fCtrl *FlieController) AbolishFile() {
+func (fCtrl *FileController) AbolishFile() {
 	resJson := NewJsonStruct(nil)
 	defer func() {
 		fCtrl.Data["json"] = resJson
@@ -118,7 +119,7 @@ func (fCtrl *FileController) AuthorityFile() {
 
 }
 
-func (fCtrl *FlieController) GetLatestTrend() {
+func (fCtrl *FileController) GetLatestTrend() {
 	resJson := NewJsonStruct(nil)
 	defer func() {
 		fCtrl.Data["json"] = resJson
@@ -262,7 +263,7 @@ func (uCtrl *FileController) UpdateFile() {
 	file.FileName = "文件"
 	file.Version = 2
 	file.VersionShow = "v1.01"
-	file.UpdateDate = time.Now()
+	file.UpdateDate = common.FormatDate(time.Now(), common.YYYY_MM_DD_HH_MM_SS)
 	file.UpdateUserId = "155"
 	file.UpdateContent = "更新"
 
@@ -302,7 +303,7 @@ func (fCtrl *FileController) GetCurrentHeader() {
 	}
 	resJson.Data = result
 }
-func (fCtrl *FlieController) GetProductHeader() {
+func (fCtrl *FileController) GetProductHeader() {
 	resJson := NewJsonStruct(nil)
 	defer func() {
 		fCtrl.Data["json"] = resJson

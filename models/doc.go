@@ -35,13 +35,18 @@ func InsertDoc(doc entity.Doc) (docId int32, funcErr error) {
 
 }
 
-func InsertFile(file DocFile) (funcErr error) {
+func InsertFile(file entity.File) (funcErr error) {
 
-	common.RecoverHandler(func(err error) {
+	defer common.RecoverHandler(func(err error) {
 		funcErr = err
 		return
 	})
-
+	num, err_InsertOne := conf.Engine.InsertOne(file)
+	common.ErrorHandler(err_InsertOne)
+	if num < 1 {
+		logs.Error("Doc表存入数据失败")
+		log.Panicln()
+	}
 	return nil
 
 }

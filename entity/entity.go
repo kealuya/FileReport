@@ -24,13 +24,13 @@ type Doc struct {
 }
 
 type File struct {
-	DocId         int       `xorm:"not null INTEGER" json:"docId,omitempty"`
-	Version       int       `xorm:"not null integer" json:"version,omitempty"`
-	VersionShow   string    `xorm:"TEXT" json:"versionShow,omitempty"`
-	UpdateDate    time.Time `xorm:"DATE" json:"updateDate"`
-	UpdateUserId  string    `xorm:"text" json:"updateUserId,omitempty"`
-	UpdateContent string    `xorm:"text" json:"updateContent,omitempty"`
-	FileName      string    `xorm:"TEXT" json:"fileName,omitempty"`
+	DocId         int    `xorm:"not null INTEGER" json:"docId,omitempty"`
+	Version       int    `xorm:"not null integer" json:"version,omitempty"`
+	VersionShow   string `xorm:"TEXT" json:"versionShow,omitempty"`
+	UpdateDate    string `xorm:"DATE" json:"updateDate"`
+	UpdateUserId  string `xorm:"text" json:"updateUserId,omitempty"`
+	UpdateContent string `xorm:"text" json:"updateContent,omitempty"`
+	FileName      string `xorm:"TEXT" json:"fileName,omitempty"`
 }
 
 type Project struct {
