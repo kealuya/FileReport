@@ -27,7 +27,29 @@ const (
 							LEFT JOIN Project p ON p.pro_id = d.pro_id 
 						GROUP BY
 							p.pro_id`
-
+	Select_doc_File = `SELECT
+						doc.doc_id,
+						doc.doc_type,
+						file.version_show,
+						doc.doc_name,
+						file.file_name,
+						doc.owner_id,
+						doc.pro_id,
+						doc.create_date,
+						doc.is_discard,
+						doc.is_owner_edit,
+						doc.is_release,
+						user.user_name AS owner,
+						file.update_content,
+						MAX( file.update_date ) AS update_date,
+						update_user.user_name AS update_user 
+					FROM
+						doc
+						INNER JOIN File file  ON file.doc_id = doc.doc_id
+						INNER JOIN User user ON user.phone_number = doc.owner_id 
+						INNER JOIN User update_user ON update_user.phone_number = file.update_user_id 
+					GROUP BY
+						doc.doc_id`
 	Select_User = `SELECT * FROM user_info WHERE userid = ? `
 
 	Update_User = `Update user_info SET user_role = ?,password = ? , modifier = ? , modify_time = ? WHERE userid = ? `

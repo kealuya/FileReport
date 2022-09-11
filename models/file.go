@@ -198,13 +198,21 @@ func FileAuthority(docinfo entity.Doc) (result string, resultErr error) {
 }
 
 type DocFile struct {
-	entity.Doc    `xorm:"extends"`
-	Version       int       `xorm:"not null integer" json:"version,omitempty"`
-	VersionShow   string    `xorm:"TEXT" json:"versionShow,omitempty"`
-	UpdateDate    time.Time `xorm:"DATE" json:"updateDate"`
-	UpdateUserId  string    `xorm:"text" json:"updateUserId,omitempty"`
-	UpdateContent string    `xorm:"text" json:"updateContent,omitempty"`
-	FileName      string    `xorm:"TEXT" json:"fileName,omitempty"`
+	DocType       string `json:"docType"`
+	VersionShow   string `json:"versionShow"`
+	DocName       string `json:"docName"`
+	FileName      string `json:"fileName"`
+	OwnerId       string `json:"ownerId"`
+	DocId         string `json:"docId"`
+	ProId         string `json:"proId"`
+	CreateDate    string `json:"createDate"`
+	IsDiscard     bool   `json:"isDiscard"`
+	IsOwnerEdit   bool   `json:"isOwnerEdit"`
+	IsRelease     bool   `json:"isRelease"`
+	Owner         string `json:"owner"`
+	UpdateContent string `json:"updateContent"`
+	UpdateDate    string `json:"updateDate"`
+	UpdateUser    string `json:"updateUser"`
 }
 
 func MyFile() (result []DocFile, resultErr error) {
@@ -216,8 +224,8 @@ func MyFile() (result []DocFile, resultErr error) {
 	})
 
 	docfile := new([]DocFile)
+	err_Select := conf.Engine.SQL(handler.Select_doc_File).Find(docfile)
 
-	err_Select := conf.Engine.Table("doc").Join("INNER", "file", "file.doc_id=doc.doc_id").Find(docfile)
 	common.ErrorHandler(err_Select)
 
 	return *docfile, nil
