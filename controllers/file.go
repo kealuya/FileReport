@@ -249,6 +249,37 @@ func (uCtrl *FileController) MyFile() {
 	}
 	resJson.Data = result
 }
+func (uCtrl *FileController) FileHistory() {
+
+	resJson := NewJsonStruct(nil)
+	defer func() {
+		uCtrl.Data["json"] = resJson
+		uCtrl.ServeJSON()
+	}()
+
+	fileinfo := make(map[string]any)
+	res := uCtrl.Ctx.Input.RequestBody
+	err_Unmarshal := json.Unmarshal(res, &fileinfo)
+	if err_Unmarshal != nil {
+		resJson.Success = false
+		resJson.Msg = fmt.Sprintf("系统错误 : %s", err_Unmarshal.Error())
+		logs.Error(err_Unmarshal)
+		return
+	}
+
+	// 不定义struct，明确接受参数
+	docId := fileinfo["docId"].(string)
+	// 判断是否是既存用户
+	result, err_FileHistory := models.FileHistory(docId)
+
+	if err_FileHistory != nil {
+		resJson.Success = false
+		resJson.Msg = fmt.Sprintf("系统错误 : %s", err_FileHistory.Error())
+		logs.Error(err_FileHistory)
+		return
+	}
+	resJson.Data = result
+}
 func (uCtrl *FileController) UpdateFile() {
 
 	resJson := NewJsonStruct(nil)

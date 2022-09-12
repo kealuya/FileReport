@@ -230,6 +230,21 @@ func MyFile() (result []DocFile, resultErr error) {
 
 	return *docfile, nil
 }
+func FileHistory(doc_id string) (result []DocFile, resultErr error) {
+
+	defer common.RecoverHandler(func(err error) {
+		result = []DocFile{}
+		resultErr = err
+		return
+	})
+
+	docfile := new([]DocFile)
+	err_Select := conf.Engine.Table("doc").Join("INNER", "file", "file.doc_id=doc.doc_id").Where("file.doc_id = ?", doc_id).Find(docfile)
+
+	common.ErrorHandler(err_Select)
+
+	return *docfile, nil
+}
 func UpdateFile(docinfo entity.Doc, fileinfo entity.File) (result string, resultErr error) {
 	session := conf.Engine.NewSession()
 	defer common.RecoverHandler(func(err error) {
