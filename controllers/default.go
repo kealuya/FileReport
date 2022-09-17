@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"FileReport/common"
 	beego "github.com/beego/beego/v2/server/web"
 )
 
@@ -31,4 +32,12 @@ func (c *MainController) GetLog() {
 		//c.Ctx.WriteString("看到我，就说明你这玩意调成功了\nsdasdsad\n")
 		c.Data["json"] = &test*/
 	c.ServeJSON()
+}
+func TokenCheck(funcname, token string) bool {
+
+	if common.ArrHasStr(common.Token_Funcs, funcname) {
+		//TODO
+		return true
+	}
+	return false
 }

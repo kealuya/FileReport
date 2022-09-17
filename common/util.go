@@ -91,3 +91,13 @@ func GenerateNumberCode(n int32) string {
 	}
 	return string(b)
 }
+func ArrHasStr(arr []string, str string) bool {
+	for _, v := range arr {
+		if str == v {
+			return true
+		}
+	}
+	return false
+}
+
+var Token_Funcs = []string{"newDoc"}
