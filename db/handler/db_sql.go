@@ -50,6 +50,27 @@ const (
 						INNER JOIN User update_user ON update_user.phone_number = file.update_user_id 
 					GROUP BY
 						doc.doc_id`
+	Select_Last_Month_Update = `SELECT
+							file.update_date,
+							doc.doc_type,
+							file.version_show,
+							doc.doc_name,
+							file.file_name,
+							doc.owner_id,
+							user.user_name AS owner,
+							doc.doc_id,
+							doc.pro_id,
+							doc.is_discard,
+							doc.is_owner_edit,
+							doc.is_release,
+							file.update_content,
+						update_user.user_name AS update_user
+						FROM
+							File file
+							INNER JOIN Doc doc ON doc.doc_id = file.doc_id
+							INNER JOIN User user ON user.phone_number = doc.owner_id 
+							INNER JOIN User update_user ON update_user.phone_number = file.update_user_id 
+							WHERE file.update_date BETWEEN date('now', "-1 month") AND date('now',"+1 day")`
 	Select_User = `SELECT * FROM user_info WHERE userid = ? `
 
 	Update_User = `Update user_info SET user_role = ?,password = ? , modifier = ? , modify_time = ? WHERE userid = ? `

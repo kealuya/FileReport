@@ -16,15 +16,6 @@ type FileResult struct {
 	Data    interface{} `json:"data"`
 }
 
-func GetRecentUpdate() (result []entity.FileRecord, resultErr error) {
-	defer common.RecoverHandler(func(rcErr error) {
-
-		result = []entity.FileRecord{}
-	})
-	productlist := db.SelectRecentUpdate()
-
-	return productlist, nil
-}
 func AbolishFile(filename, productname, userid string) (result string, resultErr error) {
 	o := orm.NewOrm()
 	to, err := o.Begin()
@@ -320,4 +311,19 @@ func GetProductHeader() (result []ProjectHeader, resultErr error) {
 	common.ErrorHandler(err_Select)
 
 	return *productheader, nil
+}
+func GetRecentUpdate() (result []DocFile, resultErr error) {
+
+	defer common.RecoverHandler(func(err error) {
+		result = []DocFile{}
+		resultErr = err
+		return
+	})
+
+	docfile := new([]DocFile)
+
+	err_Select := conf.Engine.SQL(handler.Select_Last_Month_Update).Find(docfile)
+	common.ErrorHandler(err_Select)
+
+	return *docfile, nil
 }

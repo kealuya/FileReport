@@ -15,23 +15,6 @@ type FileController struct {
 	beego.Controller
 }
 
-func (fCtrl *FileController) GetRecentUpdate() {
-	resJson := NewJsonStruct(nil)
-	defer func() {
-		fCtrl.Data["json"] = resJson
-		fCtrl.ServeJSON()
-
-	}()
-
-	filelist, err_Recent := models.GetRecentUpdate()
-	if err_Recent != nil {
-		resJson.Success = false
-		resJson.Msg = fmt.Sprintf("获取最近更新失败 : %s", err_Recent.Error())
-		logs.Error(err_Recent)
-		return
-	}
-	resJson.Data = filelist
-}
 func (fCtrl *FileController) AbolishFile() {
 	resJson := NewJsonStruct(nil)
 	defer func() {
@@ -345,6 +328,22 @@ func (fCtrl *FileController) GetProductHeader() {
 	if err_Product != nil {
 		resJson.Success = false
 		resJson.Msg = fmt.Sprintf("获取项目header失败 : %s", err_Product.Error())
+		logs.Error(err_Product)
+		return
+	}
+	resJson.Data = result
+}
+func (fCtrl *FileController) GetRecentUpdate() {
+	resJson := NewJsonStruct(nil)
+	defer func() {
+		fCtrl.Data["json"] = resJson
+		fCtrl.ServeJSON()
+
+	}()
+	result, err_Product := models.GetRecentUpdate()
+	if err_Product != nil {
+		resJson.Success = false
+		resJson.Msg = fmt.Sprintf("获取最近更新header失败 : %s", err_Product.Error())
 		logs.Error(err_Product)
 		return
 	}
