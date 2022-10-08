@@ -161,7 +161,7 @@ const httpRequest = (options: UploadRequestOptions): any => {
         let myFile: DocFile = props.item
         myFile.fileName = fileName
         myFile.ownerId = userStore.phoneNumber
-
+        myFile.proId = "1"
         // 其他字段，后端补齐
         callNewDoc(myFile).then((res: HttpResponse) => {
           if (res.success) {

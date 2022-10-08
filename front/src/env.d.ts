@@ -23,6 +23,7 @@ declare interface DocFile {
     isDiscard: boolean
     owner: string // 加工
     ownerId: string
+    proId: string
 }
 
 declare interface User {

@@ -151,23 +151,30 @@ import {ElNotification} from "element-plus/es/components/notification/index";
 import "element-plus/es/components/notification/style/index";
 import {UPLOAD_MODAL_MODE} from "~/enum";
 
+
+
+
 onMounted(() => {
   const loadingInstance = ElLoading.service({fullscreen: true})
   loadingInstance.close()
 })
 
 
+const tableData: DocFile[] = reactive(
+    []
+)
+
+
+
 const searchContent = ref('')
 
+// todo proid 此时存入pinia，供上传页面调用
 
 const release = () => {
 
 
 }
 
-const tableData: DocFile[] = reactive(
-    []
-)
 for (let i = 0; i < 15; i++) {
   tableData.push({
     fileName: "", isDiscard: false,
@@ -182,7 +189,8 @@ for (let i = 0; i < 15; i++) {
     isOwnerEdit: true,
     owner: "张三",
     updateContent: "",
-    ownerId: ""
+    ownerId: "",
+    proId:"1"
   })
 }
 
@@ -205,7 +213,8 @@ for (let i = 0; i < 3; i++) {
     owner: "张三",
     updateContent: "",
     fileName: "",
-    isDiscard: false
+    isDiscard: false,
+    proId:"1"
   })
 }
 

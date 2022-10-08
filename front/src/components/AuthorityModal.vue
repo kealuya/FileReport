@@ -21,6 +21,15 @@
           <el-radio :label="false">其他人可更新、可发布</el-radio>
         </el-radio-group>
       </div>
+
+      <div>
+        <div>修改文档名称</div>
+        <div style="display: flex;align-items: center;justify-content: start">
+          <div>文档名称：</div>
+          <el-input v-model="item.docName" size="small" style=";width: 450px"/>
+        </div>
+      </div>
+
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="isDialogShow = false">取消</el-button>

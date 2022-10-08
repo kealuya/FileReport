@@ -50,6 +50,8 @@ func (uCtrl *DocController) NewDoc() {
 		return
 	}
 
+	//
+
 	// Doc 处理
 	/*
 		fileName , docName , docType , ownerId ,proId 传过来
