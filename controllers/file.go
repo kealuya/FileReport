@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"github.com/beego/beego/v2/core/logs"
 	beego "github.com/beego/beego/v2/server/web"
+	"strconv"
 	"time"
 )
 
@@ -178,22 +179,30 @@ func (uCtrl *FileController) FileAuthority() {
 		uCtrl.ServeJSON()
 	}()
 	doc := entity.Doc{}
-	doc.IsRelease = "false"
-	doc.IsOwnerEdit = "false"
-	doc.DocName = "文档"
-	doc.DocType = "ppt"
-	doc.IsDiscard = "true"
-	doc.OwnerId = "155"
-	doc.ProId = 2
+	res := uCtrl.Ctx.Input.RequestBody
+	err_Unmarshal := json.Unmarshal(res, &doc)
+	if err_Unmarshal != nil {
+		resJson.Success = false
+		resJson.Msg = fmt.Sprintf("系统错误 : %s", err_Unmarshal.Error())
+		logs.Error(err_Unmarshal, string(res))
+		return
+	}
+	token := uCtrl.Ctx.Request.Header.Get("token")
+	if TokenCheck("fileAuthority", token, strconv.Itoa(doc.DocId)) {
+	} else {
+		resJson.Success = false
+		resJson.Msg = "非本人不允许操作"
+		return
+	}
 
-	//res := uCtrl.Ctx.Input.RequestBody
-	/*	err_Unmarshal := json.Unmarshal(res, &phoneInfo)
-		if err_Unmarshal != nil {
-			resJson.Success = false
-			resJson.Msg = fmt.Sprintf("系统错误 : %s", err_Unmarshal.Error())
-			logs.Error(err_Unmarshal, string(res))
-			return
-		}*/
+	/*	doc.IsRelease = "false"
+		doc.IsOwnerEdit = "false"
+		doc.DocName = "文档"
+		doc.DocType = "ppt"
+		doc.IsDiscard = "true"
+		doc.OwnerId = "155"
+		doc.ProId = 2*/
+
 	// 判断是否是既存用户
 	_, err_Authority := models.FileAuthority(doc)
 

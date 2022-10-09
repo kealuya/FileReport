@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"FileReport/common"
+	"FileReport/models"
 	beego "github.com/beego/beego/v2/server/web"
 )
 
@@ -33,11 +34,16 @@ func (c *MainController) GetLog() {
 		c.Data["json"] = &test*/
 	c.ServeJSON()
 }
-func TokenCheck(funcname, token string) bool {
+func TokenCheck(funcname, token, docid string) bool {
 
 	if common.ArrHasStr(common.Token_Funcs, funcname) {
 		//TODO
 		return true
+	}
+	if common.ArrHasStr(common.Self_Funcs, funcname) {
+		exist := models.CheckSelfDoc(token, docid)
+		//TODO
+		return exist
 	}
 	return false
 }

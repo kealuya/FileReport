@@ -101,3 +101,4 @@ func ArrHasStr(arr []string, str string) bool {
 }
 
 var Token_Funcs = []string{"newDoc"}
+var Self_Funcs = []string{"fileAuthority"}

@@ -143,3 +143,15 @@ func UserExist(token string) (result bool) {
 	return hasData
 
 }
+
+func CheckSelfDoc(token, docid string) (result bool) {
+	defer common.RecoverHandler(func(err error) {
+		result = false
+		return
+	})
+	userData := new(entity.User)
+	has, err_Get := conf.Engine.Table("doc").Join("INNER", "user", "user.phone_number=doc.owner_id").Where("user.token = ?", token).And("doc.doc_id = ?", docid).Get(userData)
+	common.ErrorHandler(err_Get)
+	return has
+
+}
