@@ -37,7 +37,7 @@
     <div style="height: 40px"></div>
     <el-table
         :data="tableData"
-        :default-sort="{ prop: 'updateDate', order: 'descending' }"
+        :default-sort="{prop:'updateDate',order:'descending'}"
         style="width: 100%"
     >
       <el-table-column width="60">
@@ -150,20 +150,19 @@ import {ElNotification} from "element-plus/es/components/notification/index";
  */
 import "element-plus/es/components/notification/style/index";
 import {UPLOAD_MODAL_MODE} from "~/enum";
-
-
-
+import { useRoute } from "vue-router";
 
 onMounted(() => {
   const loadingInstance = ElLoading.service({fullscreen: true})
   loadingInstance.close()
 })
 
+const projectId = useRoute().params.projectId
+console.log(projectId)
 
 const tableData: DocFile[] = reactive(
     []
 )
-
 
 
 const searchContent = ref('')
@@ -190,7 +189,7 @@ for (let i = 0; i < 15; i++) {
     owner: "张三",
     updateContent: "",
     ownerId: "",
-    proId:"1"
+    proId: "1"
   })
 }
 
@@ -214,7 +213,7 @@ for (let i = 0; i < 3; i++) {
     updateContent: "",
     fileName: "",
     isDiscard: false,
-    proId:"1"
+    proId: "1"
   })
 }
 

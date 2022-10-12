@@ -67,6 +67,7 @@ func init() {
 			),
 			// =========================
 			beego.NSRouter("/getCaptcha", &controllers.UserController{}, "post:GetCaptcha"),
+			beego.NSRouter("/getProjectList", &controllers.ProController{}, "post:GetProjectList"),
 			beego.NSRouter("/loginFr", &controllers.UserController{}, "post:LoginFr"),
 			beego.NSRouter("/newDoc", &controllers.DocController{}, "post:NewDoc"),
 			beego.NSRouter("/myFile", &controllers.FileController{}, "post:MyFile"),

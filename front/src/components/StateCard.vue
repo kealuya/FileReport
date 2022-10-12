@@ -18,7 +18,7 @@
                     :end-val="endVal1"
                     :autoplay="false"
                     suffix=""
-                    decimals="0"
+                    :decimals=0
                 />
                 <span style="font-size: 14px; "> 个</span></div>
             </el-row>
@@ -50,7 +50,7 @@
                     :autoplay="false"
                     suffix=""
                     :duration="2000"
-                    decimals="0"
+                    :decimals=0
                 />
                 <span style="font-size: 14px; "> 个</span></div>
             </el-row>
@@ -81,7 +81,7 @@
                     :end-val="endVal3"
                     :autoplay="false"
                     suffix=""
-                    decimals="0"
+                    :decimals=0
                 />
                 <span style="font-size: 14px; "> 位</span></div>
             </el-row>
@@ -113,7 +113,7 @@
                     :autoplay="false"
                     suffix=""
                     :duration="3000"
-                    decimals="0"
+                    :decimals=0
                 />
                 <span style="font-size: 14px; "> 次</span></div>
             </el-row>

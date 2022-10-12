@@ -35,6 +35,13 @@ declare interface User {
     isDisable: string
 }
 
+declare interface Project {
+    proId: string
+    proName: string
+    proLogo: string
+
+}
+
 declare interface HttpResponse {
     data: object
     msg: string

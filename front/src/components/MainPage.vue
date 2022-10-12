@@ -7,20 +7,22 @@
   <div style="display: flex;justify-content: center">
     <div class="project">
       <template v-for="item in projectList">
-        <el-card style="margin: 10px" :body-style="{ padding: '20px',width:'200px'  }" shadow="hover"
-                 @click="gotoDetail">
-          <img style="width: 100%"
-               src="https://yyk-app.obs.cn-north-4.myhuaweicloud.com/yyk_szht1949_1653543339403024.jpg"
-
-          />
-          <div style="padding: 14px">
-            <span style="font-size: 24px">{{ item.projectName }}</span>
-            <div class="bottom">
-              <div style="font-size: 12px;color: gray;">
-                {{ item.updateDate }}
-              </div>
+        <el-card style="margin: 10px" :body-style="{padding:'20px',width:'200px',height:'240px'}" shadow="hover"
+                 @click="gotoDetail(item)">
+          <div class="pro-card-display">
+            <div style="flex: 3">
+              <img style="width: 100%" :src="item.projectIcon"/>
+            </div>
+            <div style="flex: 1">
+              <span style="font-size: 24px">{{ item.projectName }}</span>
+              <!--            <div class="bottom">-->
+              <!--              <div style="font-size: 12px;color: gray;">-->
+              <!--                {{ item.updateDate }}-->
+              <!--              </div>-->
+              <!--            </div>-->
             </div>
           </div>
+
         </el-card>
       </template>
     </div>
@@ -52,15 +54,16 @@
 
 
 <script setup lang="ts">
-import {reactive, ref} from "vue";
-import {ElMessage, ElLoading} from 'element-plus'
+import {onMounted, reactive, ref} from "vue";
+import {ElMessage, ElLoading, ElMessageBox} from 'element-plus'
 import {useRouter} from "vue-router";
 import {useUserStore} from "~/stores";
+import {http} from "~/http";
+import {callGetProjectList} from "~/utils/project";
 
 const count = ref(0);
 const input = ref("element-plus");
 
-const curDate = ref('')
 
 const toast = () => {
   ElMessage.success('Hello')
@@ -68,23 +71,40 @@ const toast = () => {
 
 const router = useRouter()
 
-const gotoDetail = () => {
+const gotoDetail = (item: DisplayPro) => {
   ElLoading.service({fullscreen: true})
-  router.push("/detail")
+  router.push({name: 'Detail', params: {projectId: item.projectId}})
 }
 
-const projectList = reactive<Array<{ projectName: string, projectIcon: string, updateDate: string }>>([
-  {projectName: "差旅", projectIcon: "", updateDate: "2022-06-12 13:02:12"},
-  {projectName: "采购", projectIcon: "", updateDate: "2022-06-12"},
-  {projectName: "物流", projectIcon: "", updateDate: "2022-06-12"},
-  {projectName: "资产", projectIcon: "", updateDate: "2022-06-12"},
-  {projectName: "网约车", projectIcon: "", updateDate: "2022-06-12"},
-  {projectName: "业财融合", projectIcon: "", updateDate: "2022-06-12"},
-  {projectName: "医疗", projectIcon: "", updateDate: "2022-06-12"},
-  {projectName: "代码规约类", projectIcon: "", updateDate: "2022-06-12"},
-  {projectName: "公司管理类", projectIcon: "", updateDate: "2022-06-12"},
-  {projectName: "技能提升类", projectIcon: "", updateDate: "2022-06-12"},
-])
+type DisplayPro = { projectName: string, projectIcon: string, updateDate?: string, projectId?: string }
+const projectList = reactive<Array<DisplayPro>>([])
+const getProjectList = async () => {
+
+  let res: HttpResponse = await callGetProjectList()
+  if (res.success) {
+    let proList = res.data as Array<Project>
+
+    proList.map((pro: Project) => {
+      projectList.push({projectName: pro.proName, projectIcon: pro.proLogo, projectId: pro.proId})
+    })
+
+  } else {
+    await ElMessageBox.alert(res.msg, '提示', {
+      confirmButtonText: '好的',
+      callback: () => {
+        // resetForm(loginFormRef.value)
+      }
+    })
+  }
+
+}
+
+
+onMounted(async () => {
+
+  await getProjectList()
+
+})
 
 
 const projectNewStateData = reactive<Array<{ updateContent: string, fileName: string, updateDate: string, fileVersion: string, }>>(
@@ -203,5 +223,14 @@ const projectActiveData = reactive<Array<{ projectName: string, releaseCount: st
   width: 100%;
   display: flex;
   justify-content: space-between;
+}
+
+.pro-card-display {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 </style>
