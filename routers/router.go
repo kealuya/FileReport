@@ -40,6 +40,7 @@ func init() {
 				beego.NSRouter("/getCurrentHeader", &controllers.FileController{}, "post:GetCurrentHeader"),
 				beego.NSRouter("/getProductHeader", &controllers.FileController{}, "post:GetProductHeader"),
 				beego.NSRouter("/getRecentUpdate", &controllers.FileController{}, "post:GetRecentUpdate"),
+				beego.NSRouter("/newProject", &controllers.ProController{}, "post:NewProject"),
 			),
 			beego.NSNamespace("/file",
 				beego.NSRouter("/publishFile", &controllers.FileController{}, "post:PublishFile"),
