@@ -7,6 +7,13 @@ declare module "*.vue" {
     export default component;
 }
 
+declare type PagingInfo = {
+    proId: number
+    page: number
+    pageSize: number
+    sortCol: object
+    search: object
+}
 
 declare interface DocFile {
     docId: string

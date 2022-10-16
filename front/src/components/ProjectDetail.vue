@@ -48,7 +48,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="名称" sortable min-width="400">
+      <el-table-column label="名称" min-width="400">
         <template #default="scope">
           <div style="display: flex; align-items: center">
             <span style="margin-left: 10px">{{ scope.row.docName }}</span>
@@ -56,7 +56,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="版本" sortable min-width="100">
+      <el-table-column label="版本" min-width="100">
         <template #default="scope">
           <div style="display: flex; align-items: center">
             <span style="margin-left: 10px">{{ scope.row.versionShow }}</span>
@@ -77,7 +77,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="更新人" sortable min-width="100">
+      <el-table-column label="更新人" min-width="100">
         <template #default="scope">
           <div style="display: flex; align-items: center">
             <span style="margin-left: 10px">{{ scope.row.updateUser }}</span>
@@ -93,7 +93,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="所有者" sortable min-width="50">
+      <el-table-column label="所有者" min-width="50">
         <template #default="scope">
           <div style="display: flex; align-items: center">
             <span style="margin-left: 10px">{{ scope.row.owner }}</span>
@@ -123,7 +123,7 @@
       </el-table-column>
     </el-table>
     <div style="height: 20px"></div>
-    <el-pagination background layout="prev, pager, next" :total="1000"/>
+    <el-pagination background layout="prev, pager, next" :page-count="34"/>
   </div>
   <UploadModal v-model="uploadModalDialogVisible" :mode="uploadModalMode" :item="selectFile"
                @updateSuccess="updateSuccess"></UploadModal>
@@ -150,14 +150,33 @@ import {ElNotification} from "element-plus/es/components/notification/index";
  */
 import "element-plus/es/components/notification/style/index";
 import {UPLOAD_MODAL_MODE} from "~/enum";
-import { useRoute } from "vue-router";
+import {useRoute} from "vue-router";
+import {callDocFileList} from "~/utils/doc";
 
-onMounted(() => {
+onMounted(async () => {
   const loadingInstance = ElLoading.service({fullscreen: true})
+
+  await getDocFileList()
+
   loadingInstance.close()
 })
 
-const projectId = useRoute().params.projectId
+
+const getDocFileList = async () => {
+
+  let p: PagingInfo = {
+    proId: 1,
+    page: 1,
+    pageSize: 5,
+    sortCol: {"update_date": "ASC"},
+    // search: {}
+    search: {"doc_name": "源易控"}
+  }
+
+  await callDocFileList(p)
+}
+
+const projectId: string = useRoute().params.projectId as string
 console.log(projectId)
 
 const tableData: DocFile[] = reactive(
@@ -218,15 +237,15 @@ for (let i = 0; i < 3; i++) {
 }
 
 const uploadModalDialogVisible = ref(false)
-const selectFile = ref({})
+const selectFile = ref<DocFile>()
 const uploadModalMode = ref<UPLOAD_MODAL_MODE>()
 const fileUpdate = (type: UPLOAD_MODAL_MODE, item?: DocFile) => {
   if (type == UPLOAD_MODAL_MODE.NEW) {
-    selectFile.value = {}
+    selectFile.value = {proId: projectId} as DocFile
     uploadModalMode.value = UPLOAD_MODAL_MODE.NEW
     uploadModalDialogVisible.value = true
   } else if (type == UPLOAD_MODAL_MODE.UPLOAD) {
-    selectFile.value = item!
+    selectFile.value = {...item!, "proId": projectId}
     uploadModalMode.value = UPLOAD_MODAL_MODE.UPLOAD
     uploadModalDialogVisible.value = true
   }
@@ -240,7 +259,7 @@ const discardSuccess = () => {
 }
 const discardModalDialogVisible = ref(false)
 const fileDiscard = (item: DocFile) => {
-  selectFile.value = item
+  selectFile.value = {...item, "proId": projectId}
   discardModalDialogVisible.value = true
 }
 
@@ -249,7 +268,7 @@ const authoritySuccess = () => {
 }
 const authorityModalDialogVisible = ref(false)
 const fileAuthority = (item: DocFile) => {
-  selectFile.value = item
+  selectFile.value = {...item, "proId": projectId}
   authorityModalDialogVisible.value = true
 }
 
