@@ -98,3 +98,44 @@ func (uCtrl *DocController) NewDoc() {
 	}
 	return
 }
+
+func (uCtrl *DocController) GetDocFileList() {
+	resJson := NewJsonStruct(nil)
+	defer func() {
+		uCtrl.Data["json"] = resJson
+		uCtrl.ServeJSON()
+	}()
+
+	res := uCtrl.Ctx.Input.RequestBody
+	pi := models.PagingInfo{}
+	err_Unmarshal := json.Unmarshal(res, &pi)
+	if err_Unmarshal != nil {
+		resJson.Success = false
+		resJson.Msg = fmt.Sprintf("系统错误 : %s", err_Unmarshal.Error())
+		logs.Error(err_Unmarshal, string(res))
+		return
+	}
+
+	docFiles, err_GetDocFileListByCondition := models.GetDocFileListByCondition(pi)
+	if err_GetDocFileListByCondition != nil {
+		resJson.Success = false
+		resJson.Msg = fmt.Sprintf("系统错误 : %s", err_GetDocFileListByCondition.Error())
+		logs.Error(err_Unmarshal, string(res))
+		return
+	}
+
+	count, err_GetDocCountByProId := models.GetDocCountByProId(pi)
+	if err_GetDocCountByProId != nil {
+		resJson.Success = false
+		resJson.Msg = fmt.Sprintf("系统错误 : %s", err_GetDocCountByProId.Error())
+		logs.Error(err_Unmarshal, string(res))
+		return
+	}
+
+	dataMap := make(map[string]any)
+	dataMap["docFiles"] = docFiles
+	dataMap["count"] = count
+
+	resJson.Data = dataMap
+	return
+}

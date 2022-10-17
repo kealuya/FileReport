@@ -7,8 +7,10 @@ import (
 	"log"
 	"math/rand"
 	"reflect"
+	"regexp"
 	"runtime/debug"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -102,3 +104,25 @@ func ArrHasStr(arr []string, str string) bool {
 
 var Token_Funcs = []string{"newDoc"}
 var Self_Funcs = []string{"fileAuthority"}
+
+func ConvertToSnakeCase(input string) string {
+	var matchChars = regexp.MustCompile("(.)([A-Z][a-z]+)")
+	var matchAlpha = regexp.MustCompile("([a-z0-9])([A-Z])")
+
+	snake := matchChars.ReplaceAllString(input, "${1}_${2}")
+	snake = matchAlpha.ReplaceAllString(snake, "${1}_${2}")
+	return strings.ToLower(snake)
+}
+
+func ConvertToCaseAlpha(input string) string {
+	var matchChars = regexp.MustCompile("_([a-z])")
+	c := matchChars.ReplaceAllStringFunc(input, func(match string) string {
+		return strings.ReplaceAll(strings.ToUpper(match), "_", "")
+	})
+
+	var matchChars2 = regexp.MustCompile("^[a-z]")
+	d := matchChars2.ReplaceAllStringFunc(c, func(match string) string {
+		return strings.ToUpper(match)
+	})
+	return d
+}

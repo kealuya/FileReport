@@ -197,9 +197,9 @@ type DocFile struct {
 	DocId         string `json:"docId"`
 	ProId         string `json:"proId"`
 	CreateDate    string `json:"createDate"`
-	IsDiscard     bool   `json:"isDiscard"`
-	IsOwnerEdit   bool   `json:"isOwnerEdit"`
-	IsRelease     bool   `json:"isRelease"`
+	IsDiscard     string `json:"isDiscard"`
+	IsOwnerEdit   string `json:"isOwnerEdit"`
+	IsRelease     string `json:"isRelease"`
 	Owner         string `json:"owner"`
 	UpdateContent string `json:"updateContent"`
 	UpdateDate    string `json:"updateDate"`
