@@ -83,7 +83,6 @@ const getProjectList = async () => {
   let res: HttpResponse = await callGetProjectList()
   if (res.success) {
     let proList = res.data as Array<Project>
-
     proList.map((pro: Project) => {
       projectList.push({projectName: pro.proName, projectIcon: pro.proLogo, projectId: pro.proId})
     })

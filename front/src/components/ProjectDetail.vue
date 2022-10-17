@@ -72,7 +72,7 @@
       <el-table-column prop="updateDate" label="更新时间" sortable min-width="140">
         <template #default="scope">
           <div style="display: flex; align-items: center">
-            <span style="margin-left: 10px">{{ scope.row.updateDate }}</span>
+            <span style="margin-left: 10px">{{timeChange( scope.row.updateDate) }}</span>
           </div>
         </template>
       </el-table-column>
@@ -88,7 +88,7 @@
       <el-table-column label="追加时间" sortable min-width="140">
         <template #default="scope">
           <div style="display: flex; align-items: center">
-            <span style="margin-left: 10px">{{ scope.row.createDate }}</span>
+            <span style="margin-left: 10px">{{ timeChange( scope.row.createDate) }}</span>
           </div>
         </template>
       </el-table-column>
@@ -152,6 +152,7 @@ import "element-plus/es/components/notification/style/index";
 import {UPLOAD_MODAL_MODE} from "~/enum";
 import {useRoute} from "vue-router";
 import {callDocFileList} from "~/utils/doc";
+import {timeChange} from "~/utils/common";
 
 onMounted(async () => {
   const loadingInstance = ElLoading.service({fullscreen: true})
@@ -161,6 +162,10 @@ onMounted(async () => {
   loadingInstance.close()
 })
 
+const tableData: DocFile[] = reactive(
+    []
+)
+
 
 const getDocFileList = async () => {
 
@@ -169,117 +174,95 @@ const getDocFileList = async () => {
     page: 1,
     pageSize: 5,
     sortCol: {"update_date": "ASC"},
-    // search: {}
-    search: {"doc_name": "源易控"}
+    search: {}
+    // search: {"doc_name": "源易控"}
   }
 
-  await callDocFileList(p)
-}
+  let res: HttpResponse = await callDocFileList(p)
+  if (res.success) {
+    let data = res.data as { docFiles: Array<DocFile>, count: number }
+    tableData.push(...data.docFiles)
 
-const projectId: string = useRoute().params.projectId as string
-console.log(projectId)
-
-const tableData: DocFile[] = reactive(
-    []
-)
-
-
-const searchContent = ref('')
-
-// todo proid 此时存入pinia，供上传页面调用
-
-const release = () => {
-
-
-}
-
-for (let i = 0; i < 15; i++) {
-  tableData.push({
-    fileName: "", isDiscard: false,
-    updateDate: '2016-05-03 12:32:55',
-    docName: '浩天业财融合结算平台接口文档-v17(2)(1)111.docx',
-    createDate: '2017-08-03 12:32:51',
-    updateUser: '边宇辰',
-    versionShow: 'v1.22',
-    docType: "111",
-    isRelease: false,
-    docId: "",
-    isOwnerEdit: true,
-    owner: "张三",
-    updateContent: "",
-    ownerId: "",
-    proId: "1"
-  })
-}
-
-const headerData: DocFile[] = reactive(
-    []
-)
-
-for (let i = 0; i < 3; i++) {
-  headerData.push({
-    ownerId: "",
-    updateDate: '2016-05-03 12:32:55',
-    docName: '浩天业财融合结算平台接口文档-v17(2)(1)111.docx',
-    createDate: '2017-08-03 12:32:51',
-    updateUser: '边宇辰',
-    versionShow: 'v1.22',
-    docType: 'word',
-    isRelease: false,
-    docId: "",
-    isOwnerEdit: true,
-    owner: "张三",
-    updateContent: "",
-    fileName: "",
-    isDiscard: false,
-    proId: "1"
-  })
-}
-
-const uploadModalDialogVisible = ref(false)
-const selectFile = ref<DocFile>()
-const uploadModalMode = ref<UPLOAD_MODAL_MODE>()
-const fileUpdate = (type: UPLOAD_MODAL_MODE, item?: DocFile) => {
-  if (type == UPLOAD_MODAL_MODE.NEW) {
-    selectFile.value = {proId: projectId} as DocFile
-    uploadModalMode.value = UPLOAD_MODAL_MODE.NEW
-    uploadModalDialogVisible.value = true
-  } else if (type == UPLOAD_MODAL_MODE.UPLOAD) {
-    selectFile.value = {...item!, "proId": projectId}
-    uploadModalMode.value = UPLOAD_MODAL_MODE.UPLOAD
-    uploadModalDialogVisible.value = true
   }
-}
-const updateSuccess = () => {
-  console.log("更新list")
-}
 
-const discardSuccess = () => {
-  console.log("删除")
 }
-const discardModalDialogVisible = ref(false)
-const fileDiscard = (item: DocFile) => {
-  selectFile.value = {...item, "proId": projectId}
-  discardModalDialogVisible.value = true
-}
+  const projectId: string = useRoute().params.projectId as string
+  console.log(projectId)
 
-const authoritySuccess = () => {
-  console.log("权限")
-}
-const authorityModalDialogVisible = ref(false)
-const fileAuthority = (item: DocFile) => {
-  selectFile.value = {...item, "proId": projectId}
-  authorityModalDialogVisible.value = true
-}
 
-const fileHistory = () => {
-  ElNotification({
-    title: '版本历史',
-    message: '等等，下次再说',
-    type: 'warning',
-    offset: 300
-  })
-}
+  const searchContent = ref('')
+
+
+
+
+  const headerData: DocFile[] = reactive(
+      []
+  )
+
+  for (let i = 0; i < 3; i++) {
+    headerData.push({
+      ownerId: "",
+      updateDate: '2016-05-03 12:32:55',
+      docName: '浩天业财融合结算平台接口文档-v17(2)(1)111.docx',
+      createDate: '2017-08-03 12:32:51',
+      updateUser: '边宇辰',
+      versionShow: 'v1.22',
+      docType: 'word',
+      isRelease: false,
+      docId: "",
+      isOwnerEdit: true,
+      owner: "张三",
+      updateContent: "",
+      fileName: "",
+      isDiscard: false,
+      proId: "1"
+    })
+  }
+
+  const uploadModalDialogVisible = ref(false)
+  const selectFile = ref<DocFile>()
+  const uploadModalMode = ref<UPLOAD_MODAL_MODE>()
+  const fileUpdate = (type: UPLOAD_MODAL_MODE, item?: DocFile) => {
+    if (type == UPLOAD_MODAL_MODE.NEW) {
+      selectFile.value = {proId: projectId} as DocFile
+      uploadModalMode.value = UPLOAD_MODAL_MODE.NEW
+      uploadModalDialogVisible.value = true
+    } else if (type == UPLOAD_MODAL_MODE.UPLOAD) {
+      selectFile.value = {...item!, "proId": projectId}
+      uploadModalMode.value = UPLOAD_MODAL_MODE.UPLOAD
+      uploadModalDialogVisible.value = true
+    }
+  }
+  const updateSuccess = () => {
+    console.log("更新list")
+  }
+
+  const discardSuccess = () => {
+    console.log("删除")
+  }
+  const discardModalDialogVisible = ref(false)
+  const fileDiscard = (item: DocFile) => {
+    selectFile.value = {...item, "proId": projectId}
+    discardModalDialogVisible.value = true
+  }
+
+  const authoritySuccess = () => {
+    console.log("权限")
+  }
+  const authorityModalDialogVisible = ref(false)
+  const fileAuthority = (item: DocFile) => {
+    selectFile.value = {...item, "proId": projectId}
+    authorityModalDialogVisible.value = true
+  }
+
+  const fileHistory = () => {
+    ElNotification({
+      title: '版本历史',
+      message: '等等，下次再说',
+      type: 'warning',
+      offset: 300
+    })
+  }
 
 </script>
 <style>
