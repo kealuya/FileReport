@@ -152,6 +152,7 @@ import "element-plus/es/components/notification/style/index";
 import {UPLOAD_MODAL_MODE} from "~/enum";
 import {useRoute} from "vue-router";
 import {callDocFileList} from "~/utils/doc";
+import {callGetProjectList} from "~/utils/project";
 import {timeChange} from "~/utils/common";
 
 onMounted(async () => {
@@ -174,8 +175,8 @@ const getDocFileList = async () => {
     page: 1,
     pageSize: 5,
     sortCol: {"update_date": "ASC"},
+    // search: {}
     search: {}
-    // search: {"doc_name": "源易控"}
   }
 
   let res: HttpResponse = await callDocFileList(p)
@@ -199,25 +200,24 @@ const getDocFileList = async () => {
       []
   )
 
-  for (let i = 0; i < 3; i++) {
-    headerData.push({
-      ownerId: "",
-      updateDate: '2016-05-03 12:32:55',
-      docName: '浩天业财融合结算平台接口文档-v17(2)(1)111.docx',
-      createDate: '2017-08-03 12:32:51',
-      updateUser: '边宇辰',
-      versionShow: 'v1.22',
-      docType: 'word',
-      isRelease: false,
-      docId: "",
-      isOwnerEdit: true,
-      owner: "张三",
-      updateContent: "",
-      fileName: "",
-      isDiscard: false,
-      proId: "1"
-    })
-  }
+// for (let i = 0; i < 15; i++) {
+//   tableData.push({
+//     fileName: "", isDiscard: false,
+//     updateDate: '2016-05-03 12:32:55',
+//     docName: '浩天业财融合结算平台接口文档-v17(2)(1)111.docx',
+//     createDate: '2017-08-03 12:32:51',
+//     updateUser: '边宇辰',
+//     versionShow: 'v1.22',
+//     docType: "111",
+//     isRelease: false,
+//     docId: "",
+//     isOwnerEdit: true,
+//     owner: "张三",
+//     updateContent: "",
+//     ownerId: "",
+//     proId: "1"
+//   })
+// }
 
   const uploadModalDialogVisible = ref(false)
   const selectFile = ref<DocFile>()
