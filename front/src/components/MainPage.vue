@@ -73,7 +73,8 @@ const router = useRouter()
 
 const gotoDetail = (item: DisplayPro) => {
   ElLoading.service({fullscreen: true})
-  router.push({name: 'Detail', params: {projectId: item.projectId}})
+  // router.push({name: 'Detail', params: {projectId: item.projectId}})
+  router.push({path: '/detail', query: {projectId: item.projectId}})
 }
 
 type DisplayPro = { projectName: string, projectIcon: string, updateDate?: string, projectId?: string }

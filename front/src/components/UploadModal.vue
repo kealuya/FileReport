@@ -70,11 +70,13 @@ import {UPLOAD_MODAL_MODE} from "~/enum";
 import {useUserStore} from "~/stores";
 import {callNewDoc} from "~/utils/doc";
 import {ElMessageBox} from "element-plus/es";
+import {useRoute} from "vue-router";
 
 const ak = 'SNZGBWTDEF0IRJKXJGJF';
 const sk = 'W3H3nbgxHU3zDAblqwvTjO18V6X9ZeIexyn7Ter1';
 const server = 'obs.cn-north-4.myhuaweicloud.com';
 const bucket = 'file-report-store';
+const projectId: string = useRoute().query.projectId as string
 // ==============================================================================
 // 组件 v-modal 模式
 const props = defineProps<{ modelValue: boolean, mode: UPLOAD_MODAL_MODE, item: DocFile }>();
@@ -93,6 +95,8 @@ const isDialogShow: WritableComputedRef<boolean> = computed({
   }
 })
 // ==============================================================================
+
+
 const handleClose = () => {
 
   // 清空自己
@@ -161,7 +165,7 @@ const httpRequest = (options: UploadRequestOptions): any => {
         let myFile: DocFile = props.item
         myFile.fileName = fileName
         myFile.ownerId = userStore.phoneNumber
-        myFile.proId = "1"
+        myFile.proId = projectId
         // 其他字段，后端补齐
         callNewDoc(myFile).then((res: HttpResponse) => {
           if (res.success) {

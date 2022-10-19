@@ -28,7 +28,8 @@
           <el-image style="width: 20px; height: 20px" src="/folder/icon-new-file.png"></el-image>
         </el-button>
       </div>
-      <el-input style="width:600px" v-model="searchContent" placeholder="检索" class="input-with-select">
+      <el-input style="width:600px" v-model="searchContent" placeholder="检索" class="input-with-select"
+                @change="searchContentChange">
         <template #prepend>
           <el-button :icon="Search"/>
         </template>
@@ -37,6 +38,7 @@
     <div style="height: 40px"></div>
     <el-table
         :data="tableData"
+        @sort-change="sortChange"
         :default-sort="{prop:'updateDate',order:'descending'}"
         style="width: 100%"
     >
@@ -69,10 +71,10 @@
         </template>
       </el-table-column>
 
-      <el-table-column prop="updateDate" label="更新时间" sortable min-width="140">
+      <el-table-column prop="updateDate" label="更新时间" sortable="custom" min-width="140">
         <template #default="scope">
           <div style="display: flex; align-items: center">
-            <span style="margin-left: 10px">{{timeChange( scope.row.updateDate) }}</span>
+            <span style="margin-left: 10px">{{ timeChange(scope.row.updateDate) }}</span>
           </div>
         </template>
       </el-table-column>
@@ -85,10 +87,10 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="追加时间" sortable min-width="140">
+      <el-table-column prop="createDate" label="追加时间" sortable="custom" min-width="140">
         <template #default="scope">
           <div style="display: flex; align-items: center">
-            <span style="margin-left: 10px">{{ timeChange( scope.row.createDate) }}</span>
+            <span style="margin-left: 10px">{{ timeChange(scope.row.createDate) }}</span>
           </div>
         </template>
       </el-table-column>
@@ -123,7 +125,7 @@
       </el-table-column>
     </el-table>
     <div style="height: 20px"></div>
-    <el-pagination background layout="prev, pager, next" :page-count="34"/>
+    <el-pagination background layout="prev, pager, next" v-model:currentPage="currentPage" :page-count="pageCount"/>
   </div>
   <UploadModal v-model="uploadModalDialogVisible" :mode="uploadModalMode" :item="selectFile"
                @updateSuccess="updateSuccess"></UploadModal>
@@ -138,7 +140,7 @@
 
 // @ts-ignore
 import {Search, ArrowDown} from "@element-plus/icons-vue"
-import {onMounted, reactive, ref} from "vue";
+import {onMounted, reactive, ref, watchEffect} from "vue";
 import {ElLoading} from "element-plus/es";
 import {ElNotification} from "element-plus/es/components/notification/index";
 /*
@@ -152,117 +154,151 @@ import "element-plus/es/components/notification/style/index";
 import {UPLOAD_MODAL_MODE} from "~/enum";
 import {useRoute} from "vue-router";
 import {callDocFileList} from "~/utils/doc";
-import {callGetProjectList} from "~/utils/project";
 import {timeChange} from "~/utils/common";
 
-onMounted(async () => {
-  const loadingInstance = ElLoading.service({fullscreen: true})
+type  ParamObject = { [key: string]: string }
 
-  await getDocFileList()
+const PAGE_SIZE: number = 5
+const tableData: DocFile[] = reactive([])
+const pageCount = ref<number>(1)
+const currentPage = ref<number>(1)
+const projectId: string = useRoute().query.projectId as string
+const sortCol: ParamObject = {"updateDate": "descending"}
+const searchContent = ref("")
+const searchContentObj = reactive<ParamObject>({})
 
-  loadingInstance.close()
-})
+const getDocFileList = async (p: PagingInfo) => {
 
-const tableData: DocFile[] = reactive(
+  let res: HttpResponse = await callDocFileList(p)
+  if (res.success) {
+    tableData.length = 0
+    let data = res.data as { docFiles: Array<DocFile>, count: number }
+    tableData.push(...data.docFiles)
+    pageCount.value = Math.ceil(data.count / PAGE_SIZE)
+  }
+
+}
+
+watchEffect(
+    async () => {
+      let p: PagingInfo = {
+        proId: parseInt(projectId),
+        page: currentPage.value,
+        pageSize: PAGE_SIZE,
+        sortCol: sortCol,
+        // search: {}
+        search: searchContentObj
+      }
+      console.log("watchEffect", p)
+      await getDocFileList(p)
+    }
+)
+
+const searchContentChange = async (value: string) => {
+
+  Object.keys(searchContentObj).forEach(key => delete searchContentObj[key])
+  if (value !== "") {
+    searchContentObj["docName"] = value
+    searchContentObj["updateUser"] = value
+    searchContentObj["owner"] = value
+  }
+  currentPage.value = 1
+  let p: PagingInfo = {
+    proId: parseInt(projectId),
+    page: currentPage.value,
+    pageSize: PAGE_SIZE,
+    sortCol: sortCol,
+    search: searchContentObj
+  }
+  await getDocFileList(p)
+}
+
+
+const sortChange = async (column: any) => {
+
+  Object.keys(sortCol).forEach(key => delete sortCol[key])
+  if (column.prop !== null) {
+    sortCol[column.prop] = column.order
+  }
+  currentPage.value = 1
+  let p: PagingInfo = {
+    proId: parseInt(projectId),
+    page: currentPage.value,
+    pageSize: PAGE_SIZE,
+    sortCol: sortCol,
+    search: searchContentObj
+  }
+  await getDocFileList(p)
+}
+
+
+const headerData: DocFile[] = reactive(
     []
 )
 
 
-const getDocFileList = async () => {
-
-  let p: PagingInfo = {
-    proId: 1,
-    page: 1,
-    pageSize: 5,
-    sortCol: {"update_date": "ASC"},
-    // search: {}
-    search: {}
+const uploadModalDialogVisible = ref(false)
+const selectFile = ref<DocFile>()
+const uploadModalMode = ref<UPLOAD_MODAL_MODE>()
+const fileUpdate = (type: UPLOAD_MODAL_MODE, item?: DocFile) => {
+  if (type == UPLOAD_MODAL_MODE.NEW) {
+    selectFile.value = {proId: projectId} as DocFile
+    uploadModalMode.value = UPLOAD_MODAL_MODE.NEW
+    uploadModalDialogVisible.value = true
+  } else if (type == UPLOAD_MODAL_MODE.UPLOAD) {
+    selectFile.value = {...item!, "proId": projectId}
+    uploadModalMode.value = UPLOAD_MODAL_MODE.UPLOAD
+    uploadModalDialogVisible.value = true
   }
-
-  let res: HttpResponse = await callDocFileList(p)
-  if (res.success) {
-    let data = res.data as { docFiles: Array<DocFile>, count: number }
-    tableData.push(...data.docFiles)
-
-  }
-
 }
-  const projectId: string = useRoute().params.projectId as string
-  console.log(projectId)
+const updateSuccess = () => {
+  console.log("更新list")
+}
 
+const discardSuccess = () => {
+  console.log("删除")
+}
+const discardModalDialogVisible = ref(false)
+const fileDiscard = (item: DocFile) => {
+  selectFile.value = {...item, "proId": projectId}
+  discardModalDialogVisible.value = true
+}
 
-  const searchContent = ref('')
+const authoritySuccess = () => {
+  console.log("权限")
+}
+const authorityModalDialogVisible = ref(false)
+const fileAuthority = (item: DocFile) => {
+  selectFile.value = {...item, "proId": projectId}
+  authorityModalDialogVisible.value = true
+}
 
+const fileHistory = () => {
+  ElNotification({
+    title: '版本历史',
+    message: '等等，下次再说',
+    type: 'warning',
+    offset: 300
+  })
+}
 
+onMounted(async () => {
+  const loadingInstance = ElLoading.service({fullscreen: true})
 
+  //
+  // // 页面初始化
+  // let p: PagingInfo = {
+  //   proId: parseInt(projectId),
+  //   page: 1,
+  //   pageSize: PAGE_SIZE,
+  //   sortCol: sortCol,
+  //   // search: {}
+  //   search: {}
+  // }
+  // await getDocFileList(p)
 
-  const headerData: DocFile[] = reactive(
-      []
-  )
-
-// for (let i = 0; i < 15; i++) {
-//   tableData.push({
-//     fileName: "", isDiscard: false,
-//     updateDate: '2016-05-03 12:32:55',
-//     docName: '浩天业财融合结算平台接口文档-v17(2)(1)111.docx',
-//     createDate: '2017-08-03 12:32:51',
-//     updateUser: '边宇辰',
-//     versionShow: 'v1.22',
-//     docType: "111",
-//     isRelease: false,
-//     docId: "",
-//     isOwnerEdit: true,
-//     owner: "张三",
-//     updateContent: "",
-//     ownerId: "",
-//     proId: "1"
-//   })
-// }
-
-  const uploadModalDialogVisible = ref(false)
-  const selectFile = ref<DocFile>()
-  const uploadModalMode = ref<UPLOAD_MODAL_MODE>()
-  const fileUpdate = (type: UPLOAD_MODAL_MODE, item?: DocFile) => {
-    if (type == UPLOAD_MODAL_MODE.NEW) {
-      selectFile.value = {proId: projectId} as DocFile
-      uploadModalMode.value = UPLOAD_MODAL_MODE.NEW
-      uploadModalDialogVisible.value = true
-    } else if (type == UPLOAD_MODAL_MODE.UPLOAD) {
-      selectFile.value = {...item!, "proId": projectId}
-      uploadModalMode.value = UPLOAD_MODAL_MODE.UPLOAD
-      uploadModalDialogVisible.value = true
-    }
-  }
-  const updateSuccess = () => {
-    console.log("更新list")
-  }
-
-  const discardSuccess = () => {
-    console.log("删除")
-  }
-  const discardModalDialogVisible = ref(false)
-  const fileDiscard = (item: DocFile) => {
-    selectFile.value = {...item, "proId": projectId}
-    discardModalDialogVisible.value = true
-  }
-
-  const authoritySuccess = () => {
-    console.log("权限")
-  }
-  const authorityModalDialogVisible = ref(false)
-  const fileAuthority = (item: DocFile) => {
-    selectFile.value = {...item, "proId": projectId}
-    authorityModalDialogVisible.value = true
-  }
-
-  const fileHistory = () => {
-    ElNotification({
-      title: '版本历史',
-      message: '等等，下次再说',
-      type: 'warning',
-      offset: 300
-    })
-  }
+  loadingInstance.close()
+})
 
 </script>
 <style>

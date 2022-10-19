@@ -71,8 +71,8 @@ func GetDocFileListByCondition(paging PagingInfo) (docFiles []DocFile, funcErr e
 
 	var docFileMapArray = make([]map[string]any, 0)
 	querySql, queryParam := makeSql(paging)
-
 	err_Find := conf.Engine.SQL(querySql, queryParam...).Find(&docFileMapArray)
+	fmt.Printf("%+v", err_Find)
 	common.ErrorHandler(err_Find)
 
 	docFiles = make([]DocFile, 0)
@@ -100,19 +100,45 @@ func makeSql(paging PagingInfo) (query any, args []any) {
 
 	var searchSql string = ""
 	var searchParam []any = make([]any, 0)
-	for _, v := range paging.Search {
+	for k, v := range paging.Search {
 		// name like '%tom%'
-		searchSql = searchSql + " AND " + "doc_name" + " like ? "
-		searchParam = append(searchParam, "%"+v+"%")
 
+		kv := ""
+		if strings.Contains(k, "docName") {
+			kv = "doc_name"
+		} else if strings.Contains(k, "updateUser") {
+			kv = "update_user"
+		} else if strings.Contains(k, "owner") {
+			kv = "owner"
+		}
+
+		searchSql = searchSql + kv + " like ? " + " OR "
+		if kv != "" {
+			searchParam = append(searchParam, "%"+v+"%")
+		}
+	}
+	if searchSql != "" {
+		searchSql = " AND ( " + searchSql[:len(searchSql)-4] + " ) "
 	}
 
 	var orderSql string = ""
-	var orderParam any = ""
 	for k, v := range paging.SortCol {
-		// time desc
-		orderSql = "ORDER BY ? "
-		orderParam = k + " " + v
+		// column like createDate
+		// "ascending"  "descending"
+		// orderby不支持？，需要自己处理sql注入，可以通过白名单解决，
+		// 前端预定符号代表字段名及排序类型，后端根据符号拼接，避免注入
+		orderSql = "ORDER BY "
+
+		kv := "createDate"
+		if strings.Contains(k, "updateDate") {
+			kv = "updateDate"
+		}
+
+		vv := "asc"
+		if strings.Contains(v, "desc") {
+			vv = "desc"
+		}
+		orderSql = orderSql + common.ConvertHumpNameToSnakeCase(kv) + " " + vv + " "
 	}
 	var limitSql string = ""
 	var limitParam = []any{}
@@ -141,9 +167,13 @@ func makeSql(paging PagingInfo) (query any, args []any) {
 
 	paramArray := make([]any, 0)
 	paramArray = append(paramArray, proId)
-	paramArray = append(paramArray, searchParam...)
-	paramArray = append(paramArray, orderParam)
-	paramArray = append(paramArray, limitParam...)
+	if len(searchParam) > 0 {
+		paramArray = append(paramArray, searchParam...)
+	}
+
+	if len(limitParam) > 0 {
+		paramArray = append(paramArray, limitParam...)
+	}
 
 	querySql, queryParam, queryError := ToSQL(Expr(sb.String(), paramArray...))
 	common.ErrorHandler(queryError)

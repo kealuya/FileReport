@@ -126,3 +126,11 @@ func ConvertToCaseAlpha(input string) string {
 	})
 	return d
 }
+
+func ConvertHumpNameToSnakeCase(input string) string {
+	var matchChars = regexp.MustCompile("[A-Z]")
+	d := matchChars.ReplaceAllStringFunc(input, func(match string) string {
+		return "_" + strings.ToLower(match)
+	})
+	return d
+}
