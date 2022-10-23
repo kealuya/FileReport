@@ -47,3 +47,9 @@ type User struct {
 	Unique      string    `xorm:"TEXT" json:"unique,omitempty"`
 	IsDisable   string    `xorm:"TEXT" json:"isDisable,omitempty"`
 }
+type Record struct {
+	RecId      int    `xorm:"not null  pk autoincr INTEGER" json:"recId"`
+	Token      string `xorm:"text" json:"token"`
+	RouteName  string `xorm:"TEXT" json:"routeName"`
+	CreateTime string `xorm:"date" json:"createTime"`
+}

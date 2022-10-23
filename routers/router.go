@@ -1,11 +1,16 @@
 package routers
 
 import (
+	"FileReport/common"
 	"FileReport/conf"
 	"FileReport/controllers"
+	"FileReport/entity"
 	"FileReport/models"
+	"encoding/json"
+	"github.com/beego/beego/v2/core/logs"
 	beego "github.com/beego/beego/v2/server/web"
 	"github.com/beego/beego/v2/server/web/context"
+	"time"
 )
 
 var AuthFilter = func(ctx *context.Context) {
@@ -23,12 +28,29 @@ var AuthFilter = func(ctx *context.Context) {
 	}
 	// 权限验证过滤器内容
 }
+var FilterLog = func(ctx *context.Context) {
+	url, _ := json.Marshal(ctx.Input.Data()["RouterPattern"])
+	params, _ := json.Marshal(ctx.Input.RequestBody)
+	outputBytes, _ := json.Marshal(ctx.Input.Data()["json"])
+	token := ctx.Request.Header.Get("token")
+	divider := " - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+	topDivider := "┌" + divider
+	middleDivider := "├" + divider
+	bottomDivider := "└" + divider
+	outputStr := "\n" + topDivider + "\n│ 请求地址:" + string(url) + "\n" + middleDivider + "\n│ 请求参数:" + string(params) + "\n│ 返回数据:" + string(outputBytes) + "\n" + bottomDivider
+	logs.Info(outputStr)
+	rec := entity.Record{
+		Token:      token,
+		RouteName:  string(url),
+		CreateTime: common.FormatDate(time.Now(), common.YYYY_MM_DD_HH_MM_SS)}
+	models.SaveRecord(rec)
+}
 
 func init() {
 	// beego log、db、缓存 初始化
 	// 如果在main方法中通过init方式执行，log会不起作用，故明确调用
 	conf.InitConf()
-
+	//beego.InsertFilter("/*", beego.FinishRouter, FilterLog, beego.WithReturnOnOutput(false))
 	namespace :=
 		beego.NewNamespace("/v1",
 
