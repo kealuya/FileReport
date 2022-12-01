@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host 172.16.160.47",
     "build": "vite build",
     "generate": "vite-ssg build",
     "preview": "vite preview",

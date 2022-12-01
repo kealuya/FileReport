@@ -50,6 +50,9 @@
   </div>
   <div style="height: 150px"></div>
 
+  <div id="qr-code-full-region"></div>
+
+
 </template>
 
 
@@ -60,6 +63,30 @@ import {useRouter} from "vue-router";
 import {useUserStore} from "~/stores";
 import {http} from "~/http";
 import {callGetProjectList} from "~/utils/project";
+
+
+
+
+declare var Html5QrcodeScanner: any;
+onMounted(() => {
+  const config = {
+    fps: 10,
+    qrbox: 250,
+  };
+  const html5QrcodeScanner = new Html5QrcodeScanner('qr-code-full-region', config);
+  html5QrcodeScanner.render(
+      (decodedText: any, decodedResult: any) => {
+        console.log(decodedText, decodedResult)
+      }
+  );
+
+
+})
+
+
+
+
+
 
 const count = ref(0);
 const input = ref("element-plus");
