@@ -189,21 +189,22 @@ func FileAuthority(docinfo entity.Doc) (result string, resultErr error) {
 }
 
 type DocFile struct {
-	DocType       string `json:"docType"`
-	VersionShow   string `json:"versionShow"`
-	DocName       string `json:"docName"`
-	FileName      string `json:"fileName"`
-	OwnerId       string `json:"ownerId"`
-	DocId         string `json:"docId"`
-	ProId         string `json:"proId"`
-	CreateDate    string `json:"createDate"`
-	IsDiscard     string `json:"isDiscard"`
-	IsOwnerEdit   string `json:"isOwnerEdit"`
-	IsRelease     string `json:"isRelease"`
-	Owner         string `json:"owner"`
-	UpdateContent string `json:"updateContent"`
-	UpdateDate    string `json:"updateDate"`
-	UpdateUser    string `json:"updateUser"`
+	DocType           string              `json:"docType"`
+	VersionShow       string              `json:"versionShow"`
+	DocName           string              `json:"docName"`
+	FileName          string              `json:"fileName"`
+	OwnerId           string              `json:"ownerId"`
+	DocId             string              `json:"docId"`
+	ProId             string              `json:"proId"`
+	CreateDate        string              `json:"createDate"`
+	IsDiscard         string              `json:"isDiscard"`
+	IsOwnerEdit       string              `json:"isOwnerEdit"`
+	IsRelease         string              `json:"isRelease"`
+	Owner             string              `json:"owner"`
+	UpdateContent     string              `json:"updateContent"`
+	UpdateDate        string              `json:"updateDate"`
+	UpdateUser        string              `json:"updateUser"`
+	UpdateContentList []map[string]string `json:"updateContentList"`
 }
 
 func MyFile() (result []DocFile, resultErr error) {

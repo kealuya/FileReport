@@ -10,6 +10,7 @@ require (
 	github.com/gohouse/t v0.0.0-20201007094014-630049a6bfe9
 	github.com/json-iterator/go v1.1.12
 	github.com/mattn/go-sqlite3 v1.14.9
+	xorm.io/builder v0.3.11-0.20220531020008-1bd24a7dc978
 	xorm.io/xorm v1.3.1
 )
 
@@ -43,5 +44,4 @@ require (
 	gopkg.in/check.v1 v1.0.0-20200902074654-038fdea0a05b // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	xorm.io/builder v0.3.11-0.20220531020008-1bd24a7dc978 // indirect
 )

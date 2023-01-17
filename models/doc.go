@@ -54,6 +54,25 @@ func InsertFile(file entity.File) (funcErr error) {
 
 }
 
+func GetFileVersion(docId string) (version string, funcErr error) {
+
+	defer common.RecoverHandler(func(err error) {
+		funcErr = err
+		return
+	})
+
+	var mapArray = make([]map[string]any, 0)
+	err := conf.Engine.SQL(`select  max(version) as version from File where doc_id = ?`, t.New(docId).Int32()).Find(&mapArray)
+	common.ErrorHandler(err)
+
+	if len(mapArray) == 0 {
+		log.Panicln("no record")
+	}
+
+	return mapArray[0]["version"].(string), nil
+
+}
+
 type PagingInfo struct {
 	ProId    int32             `json:"proId,omitempty"`
 	Page     int32             `json:"page,omitempty"`
@@ -76,7 +95,6 @@ func GetDocFileListByCondition(paging PagingInfo) (docFiles []DocFile, funcErr e
 	common.ErrorHandler(err_Find)
 
 	docFiles = make([]DocFile, 0)
-	//fmt.Printf("%+v", docFileMapArray[0])
 	for _, docFileMap := range docFileMapArray {
 		docFile := DocFile{}
 		for k, v := range docFileMap {
@@ -87,7 +105,19 @@ func GetDocFileListByCondition(paging PagingInfo) (docFiles []DocFile, funcErr e
 				docFileValue.Elem().FieldByName(fieldName).SetString(t.New(v).String())
 			}
 		}
-		//logs.Info(fmt.Sprintf("%+v", docFile))
+		// 追加 updateContentList 处理
+		docId := t.New(docFileMap["doc_id"]).String()
+
+		updateContentList := make([]map[string]string, 0)
+		err_updateContentList := conf.Engine.SQL("select version_show as versionShow, update_content as updateContent from File where doc_id = ? order by update_date desc limit 5",
+			docId).Find(&updateContentList)
+		if err_updateContentList != nil {
+			common.ErrorHandler(err_updateContentList)
+		}
+
+		fmt.Println(docId, updateContentList)
+
+		docFile.UpdateContentList = updateContentList
 		docFiles = append(docFiles, docFile)
 	}
 
