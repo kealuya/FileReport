@@ -3,7 +3,8 @@
   "private": true,
   "version": "0.1.0",
   "scripts": {
-    "dev": "vite --host 172.16.160.47",
+    "dev": "vite",
+    "devHost": "vite --host 172.16.160.47",
     "build": "vite build",
     "generate": "vite-ssg build",
     "preview": "vite preview",
@@ -18,6 +19,7 @@
     "countup.js": "^2.2.0",
     "element-plus": "^2.2.12",
     "huawei-obs-sdk": "^3.21.6",
+    "js-base64": "^3.7.4",
     "js-cookie": "^3.0.1",
     "pinia": "^2.0.17",
     "pinia-plugin-persist": "^1.0.0",

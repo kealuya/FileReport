@@ -38,6 +38,22 @@ func InsertDoc(doc entity.Doc) (docId int32, funcErr error) {
 
 }
 
+func UpdateDoc(doc entity.Doc) (funcErr error) {
+
+	common.RecoverHandler(func(err error) {
+		funcErr = err
+		return
+	})
+
+	num, err_Update := conf.Engine.ID(doc.DocId).Update(doc)
+	common.ErrorHandler(err_Update)
+	if num < 1 {
+		logs.Error("Doc表更新数据失败")
+		log.Panicln("Doc表更新数据失败")
+	}
+	return nil
+}
+
 func InsertFile(file entity.File) (funcErr error) {
 
 	defer common.RecoverHandler(func(err error) {

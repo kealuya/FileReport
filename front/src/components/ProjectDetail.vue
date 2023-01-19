@@ -37,6 +37,7 @@
     </div>
     <div style="height: 40px"></div>
     <el-table
+        :stripe="true"
         :data="tableData"
         @sort-change="sortChange"
         :default-sort="{prop:'updateDate',order:'descending'}"
@@ -53,7 +54,45 @@
       <el-table-column label="名称" min-width="400">
         <template #default="scope">
           <div style="display: flex; align-items: center">
-            <span style="margin-left: 10px">{{ scope.row.docName }}</span>
+            <span style="margin-left: 10px">
+                 {{ scope.row.docName }}
+             </span>
+            <template v-if="scope.row.isDiscard == 'true'">
+              <el-image style="width: 20px; height: 20px;margin-left: 10px" src="/discard.png"></el-image>
+            </template>
+            <template v-else>
+              <template v-if="scope.row.isRelease == 'true'">
+                <el-image style="width: 20px; height: 20px;margin-left: 10px" src="/isRelease.png"></el-image>
+              </template>
+              <template v-else>
+                <el-image style="width: 20px; height: 20px;margin-left: 10px" src="/noRelease.png"></el-image>
+              </template>
+
+              <template v-if="scope.row.isOwnerEdit == 'true'">
+                <el-image style="width: 20px; height: 20px;margin-left: 10px" src="/isOwner.png"></el-image>
+              </template>
+              <template v-else>
+                <el-image style="width: 20px; height: 20px;margin-left: 10px" src="/noOwner.png"></el-image>
+              </template>
+            </template>
+
+
+          </div>
+        </template>
+      </el-table-column>
+
+      <el-table-column label="" min-width="100">
+        <template #default="scope">
+          <div style="display: flex; align-items: center">
+            <div style="display: flex; align-items: center">
+              <el-image @click="downloadClickFile(scope.row.fileName,scope.row.docName )"
+                        style="width: 20px; height: 20px" src="/download.png"></el-image>
+            </div>
+            <div style="width: 30px"></div>
+            <div style="display: flex; align-items: center">
+              <el-image @click="reviewClickFile(scope.row.fileName)" style="width: 20px; height: 20px"
+                        src="/review.png"></el-image>
+            </div>
           </div>
         </template>
       </el-table-column>
@@ -62,6 +101,18 @@
         <template #default="scope">
           <div style="display: flex; align-items: center">
             <span style="margin-left: 10px">{{ scope.row.versionShow }}</span>
+            <el-popover placement="right" :width="200" trigger="hover">
+              <template #reference>
+                <div style="display: flex; align-items: center">
+                  <el-image style="width: 20px; height: 20px" src="/list.png"></el-image>
+                </div>
+              </template>
+              <el-table :data=" scope.row.updateContentList ">
+                <el-table-column width="80" property="versionShow" label="版本"/>
+                <el-table-column width="120" property="updateContent" label="更新内容"/>
+              </el-table>
+            </el-popover>
+
             <template v-if="scope.row.isRelease===true">
               <div class="release">
                 发布
@@ -104,23 +155,33 @@
       </el-table-column>
 
       <el-table-column label="操作" min-width="120">
+
         <template #default="scope">
-          <el-dropdown>
-            <el-button type="primary">
-              操作
+          <template v-if="scope.row.isDiscard=='true'">
+            <el-button type="primary" plain disabled> 操作
               <el-icon class="el-icon--right">
                 <arrow-down/>
               </el-icon>
             </el-button>
-            <template #dropdown>
-              <el-dropdown-menu>
-                <el-dropdown-item @click="fileUpdate(UPLOAD_MODAL_MODE.UPLOAD,scope.row)">更新上传</el-dropdown-item>
-                <el-dropdown-item @click="fileAuthority(scope.row)">权限调整</el-dropdown-item>
-                <el-dropdown-item @click="fileDiscard(scope.row)">废弃文档</el-dropdown-item>
-                <el-dropdown-item @click="fileHistory">版本历史</el-dropdown-item>
-              </el-dropdown-menu>
-            </template>
-          </el-dropdown>
+          </template>
+          <template v-else>
+            <el-dropdown>
+              <el-button type="primary">
+                操作
+                <el-icon class="el-icon--right">
+                  <arrow-down/>
+                </el-icon>
+              </el-button>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item @click="fileUpdate(UPLOAD_MODAL_MODE.UPLOAD,scope.row)">更新上传</el-dropdown-item>
+                  <el-dropdown-item divided @click="fileAuthority(scope.row)">权限调整</el-dropdown-item>
+                  <el-dropdown-item @click="fileDiscard(scope.row)">废弃文档</el-dropdown-item>
+                  <el-dropdown-item @click="fileHistory">版本历史</el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+          </template>
         </template>
       </el-table-column>
     </el-table>
@@ -143,6 +204,7 @@ import {Search, ArrowDown} from "@element-plus/icons-vue"
 import {onMounted, reactive, ref, watchEffect} from "vue";
 import {ElLoading} from "element-plus/es";
 import {ElNotification} from "element-plus/es/components/notification/index";
+import {Base64} from 'js-base64';
 /*
   [Bug Report] ElNotification样式错乱 #5968
   https://github.com/element-plus/element-plus/issues/5968
@@ -155,6 +217,8 @@ import {UPLOAD_MODAL_MODE} from "~/enum";
 import {useRoute} from "vue-router";
 import {callDocFileList} from "~/utils/doc";
 import {timeChange} from "~/utils/common";
+import {downLoadFile} from "~/utils/common";
+import {OBS_URL} from "~/utils/common";
 
 type  ParamObject = { [key: string]: string }
 
@@ -163,10 +227,11 @@ const tableData: DocFile[] = reactive([])
 const pageCount = ref<number>(1)
 const currentPage = ref<number>(1)
 const projectId: string = useRoute().query.projectId as string
-const sortCol: ParamObject = {"updateDate": "descending"}
+const sortCol = reactive<ParamObject>({"updateDate": "descending"})
 const searchContent = ref("")
 const searchContentObj = reactive<ParamObject>({})
 
+// 检索定义
 const getDocFileList = async (p: PagingInfo) => {
 
   let res: HttpResponse = await callDocFileList(p)
@@ -203,23 +268,48 @@ const searchContentChange = async (value: string) => {
     searchContentObj["owner"] = value
   }
   currentPage.value = 1
-  let p: PagingInfo = {
-    proId: parseInt(projectId),
-    page: currentPage.value,
-    pageSize: PAGE_SIZE,
-    sortCol: sortCol,
-    search: searchContentObj
-  }
-  await getDocFileList(p)
+
+}
+
+const downloadClickFile = (fileName: string, docName: string) => {
+  downLoadFile(OBS_URL + fileName, docName)
+}
+
+const reviewClickFile = (fileName: string) => {
+  window.open('http://science.qcykj.com.cn:8012/onlinePreview?url=' + encodeURIComponent(Base64.encode(OBS_URL + fileName)));
 }
 
 
 const sortChange = async (column: any) => {
-
+  console.log(column)
   Object.keys(sortCol).forEach(key => delete sortCol[key])
   if (column.prop !== null) {
     sortCol[column.prop] = column.order
   }
+  currentPage.value = 1
+
+}
+
+
+const headerData: DocFile[] = reactive([])
+
+
+const uploadModalDialogVisible = ref(false)
+const selectFile = ref<DocFile>()
+const uploadModalMode = ref<UPLOAD_MODAL_MODE>()
+const fileUpdate = (type: UPLOAD_MODAL_MODE, item?: DocFile) => {
+  if (type == UPLOAD_MODAL_MODE.NEW) {
+    selectFile.value = {proId: projectId} as DocFile
+    uploadModalMode.value = UPLOAD_MODAL_MODE.NEW
+  } else if (type == UPLOAD_MODAL_MODE.UPLOAD) {
+    selectFile.value = {...item!, "proId": projectId}
+    uploadModalMode.value = UPLOAD_MODAL_MODE.UPLOAD
+  }
+  uploadModalDialogVisible.value = true
+}
+const updateSuccess = async () => {
+  console.log("更新list")
+  Object.keys(searchContentObj).forEach(key => delete searchContentObj[key])
   currentPage.value = 1
   let p: PagingInfo = {
     proId: parseInt(projectId),
@@ -231,45 +321,23 @@ const sortChange = async (column: any) => {
   await getDocFileList(p)
 }
 
-
-const headerData: DocFile[] = reactive(
-    []
-)
-
-
-const uploadModalDialogVisible = ref(false)
-const selectFile = ref<DocFile>()
-const uploadModalMode = ref<UPLOAD_MODAL_MODE>()
-const fileUpdate = (type: UPLOAD_MODAL_MODE, item?: DocFile) => {
-  if (type == UPLOAD_MODAL_MODE.NEW) {
-    selectFile.value = {proId: projectId} as DocFile
-    uploadModalMode.value = UPLOAD_MODAL_MODE.NEW
-    uploadModalDialogVisible.value = true
-  } else if (type == UPLOAD_MODAL_MODE.UPLOAD) {
-    selectFile.value = {...item!, "proId": projectId}
-    uploadModalMode.value = UPLOAD_MODAL_MODE.UPLOAD
-    uploadModalDialogVisible.value = true
-  }
-}
-const updateSuccess = () => {
-  console.log("更新list")
-}
-
 const discardSuccess = () => {
   console.log("删除")
+  updateSuccess()
 }
 const discardModalDialogVisible = ref(false)
 const fileDiscard = (item: DocFile) => {
-  selectFile.value = {...item, "proId": projectId}
+  selectFile.value = {...item!, "proId": projectId}
   discardModalDialogVisible.value = true
 }
 
 const authoritySuccess = () => {
   console.log("权限")
+  updateSuccess()
 }
 const authorityModalDialogVisible = ref(false)
 const fileAuthority = (item: DocFile) => {
-  selectFile.value = {...item, "proId": projectId}
+  selectFile.value = {...item!, "proId": projectId}
   authorityModalDialogVisible.value = true
 }
 
@@ -284,21 +352,9 @@ const fileHistory = () => {
 
 onMounted(async () => {
   const loadingInstance = ElLoading.service({fullscreen: true})
-
-  //
-  // // 页面初始化
-  // let p: PagingInfo = {
-  //   proId: parseInt(projectId),
-  //   page: 1,
-  //   pageSize: PAGE_SIZE,
-  //   sortCol: sortCol,
-  //   // search: {}
-  //   search: {}
-  // }
-  // await getDocFileList(p)
-
   loadingInstance.close()
 })
+
 
 </script>
 <style>

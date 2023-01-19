@@ -37,6 +37,9 @@
         <template v-if="mode==UPLOAD_MODAL_MODE.UPLOAD">
           <div>更新后版本：</div>
           <el-input v-model="updatedVersion" size="small" style=";width: 80px" maxlength="5"/>
+          <div style="width: 20px;"></div>
+          <div>更新内容概要：</div>
+          <el-input v-model="updateContent" size="small" style=";width: 180px"/>
         </template>
       </div>
       <div style="height: 10px;"></div>
@@ -54,7 +57,7 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, ref} from "vue";
+import {computed, onMounted, ref} from "vue";
 import {
   ElLoading,
   ElMessage,
@@ -68,7 +71,7 @@ import {
 import {WritableComputedRef} from "@vue/reactivity";
 import {UPLOAD_MODAL_MODE} from "~/enum";
 import {useUserStore} from "~/stores";
-import {callNewDoc} from "~/utils/doc";
+import {callNewDoc, callUpdateDoc} from "~/utils/doc";
 import {ElMessageBox} from "element-plus/es";
 import {useRoute} from "vue-router";
 
@@ -97,11 +100,14 @@ const isDialogShow: WritableComputedRef<boolean> = computed({
 // ==============================================================================
 
 
+
+const updateContent = ref('')
+
 const handleClose = () => {
 
   // 清空自己
   uploadRef.value!.clearFiles()
-
+  updateContent.value = ""
   isUploadBtnDisabled.value = true
   updatedVersion.value = ""
   // 关闭自己
@@ -150,10 +156,11 @@ const httpRequest = (options: UploadRequestOptions): any => {
 
   const userStore = useUserStore()
 
+  // 按照规则拼接filename
+  let fileName = userStore.phoneNumber + "-" + Date.now() + "." + props.item.docType
+
   if (props.mode === UPLOAD_MODAL_MODE.NEW) {
     // 新建文档的场合
-    // 按照规则拼接filename
-    let fileName = userStore.phoneNumber + "-" + Date.now() + "." + props.item.docType
     //上传
     obsClient.putObject({
       Bucket: bucket,
@@ -185,9 +192,43 @@ const httpRequest = (options: UploadRequestOptions): any => {
           }
         })
       }
-    });
+    })
   } else {
-
+    // UPLOAD_MODAL_MODE.UPLOAD
+    // 更新文档规则
+    // 上传
+    obsClient.putObject({
+      Bucket: bucket,
+      Key: fileName,
+      SourceFile: options.file
+    }).then(function (result: any) {
+      if (result.CommonMsg.Status < 300) {
+        // 上传成功，后台处理
+        let myFile: DocFile = props.item
+        myFile.fileName = fileName
+        myFile.updateUser = userStore.phoneNumber
+        myFile.versionShow = updatedVersion.value
+        myFile.updateContent = updateContent.value
+        // 其他字段，后端补齐
+        callUpdateDoc(myFile).then((res: HttpResponse) => {
+          if (res.success) {
+            // 关闭加载
+            loadingFlg.close()
+            // 清空自己
+            handleClose()
+            ElMessage.success('上传 ' + props.item.docName + ' 文件成功')
+            // 上传成功,考虑只是通知上一个页面刷新...
+            emit('updateSuccess')
+          } else {
+            ElMessageBox.alert(res.msg, '提示', {
+              confirmButtonText: '好的',
+              callback: () => {
+              }
+            })
+          }
+        })
+      }
+    })
   }
 
 

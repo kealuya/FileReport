@@ -185,3 +185,38 @@ func (uCtrl *DocController) GetDocFileList() {
 	resJson.Data = dataMap
 	return
 }
+
+func (uCtrl *DocController) UpdateAuthorityDoc() {
+	resJson := NewJsonStruct(nil)
+	defer func() {
+		uCtrl.Data["json"] = resJson
+		uCtrl.ServeJSON()
+	}()
+
+	res := uCtrl.Ctx.Input.RequestBody
+
+	docFile := DocFile{}
+	err_Unmarshal := json.Unmarshal(res, &docFile)
+	if err_Unmarshal != nil {
+		resJson.Success = false
+		resJson.Msg = fmt.Sprintf("系统错误 : %s", err_Unmarshal.Error())
+		logs.Error(err_Unmarshal, string(res))
+		return
+	}
+	// DocId 必备
+	doc := entity.Doc{
+		DocId:       t.New(docFile.DocId).Int(),
+		DocName:     docFile.DocName,
+		IsRelease:   docFile.IsRelease,
+		IsOwnerEdit: docFile.IsOwnerEdit,
+		IsDiscard:   docFile.IsDiscard,
+	}
+	err_UpdateDoc := models.UpdateDoc(doc)
+	if err_UpdateDoc != nil {
+		resJson.Success = false
+		resJson.Msg = fmt.Sprintf("系统错误 : %s", err_UpdateDoc.Error())
+		logs.Error(err_UpdateDoc, string(res))
+		return
+	}
+	return
+}

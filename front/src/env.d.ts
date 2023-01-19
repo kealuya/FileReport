@@ -25,12 +25,13 @@ declare interface DocFile {
     updateContent: string
     versionShow: string
     docType: string
-    isRelease: false
-    isOwnerEdit: boolean
-    isDiscard: boolean
+    isRelease: string
+    isOwnerEdit: string
+    isDiscard: string
     owner: string // 加工
     ownerId: string
     proId: string
+    updateContentList: Array<{ [string: string], string }>
 }
 
 declare interface User {

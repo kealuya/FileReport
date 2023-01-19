@@ -95,6 +95,7 @@ func init() {
 			beego.NSRouter("/loginFr", &controllers.UserController{}, "post:LoginFr"),
 			beego.NSRouter("/newDoc", &controllers.DocController{}, "post:NewDoc"),
 			beego.NSRouter("/updateDoc", &controllers.DocController{}, "post:UpdateDoc"),
+			beego.NSRouter("/updateAuthorityDoc", &controllers.DocController{}, "post:UpdateAuthorityDoc"),
 			beego.NSRouter("/myFile", &controllers.FileController{}, "post:MyFile"),
 			beego.NSRouter("/fileHistory", &controllers.FileController{}, "post:FileHistory"),
 		)
