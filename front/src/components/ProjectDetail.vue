@@ -36,6 +36,8 @@
       </el-input>
     </div>
     <div style="height: 40px"></div>
+    <el-image referrer="http://renhao666" style="width: 140px;height: 140px" src="https://yyk-app-store.obs.myhuaweicloud.com/resource/Default_A_detailed_illustration_a_beautiful_women_wearing_tren_0_25e06939-4b26-41a7-a7d8-e3405d2f28b5_1.jpg"></el-image>
+
     <el-table
         :stripe="true"
         :data="tableData"
@@ -50,8 +52,7 @@
           </div>
         </template>
       </el-table-column>
-
-      <el-table-column label="名称" min-width="400">
+         <el-table-column label="名称" min-width="400">
         <template #default="scope">
           <div style="display: flex; align-items: center">
             <span style="margin-left: 10px">
@@ -155,7 +156,6 @@
       </el-table-column>
 
       <el-table-column label="操作" min-width="120">
-
         <template #default="scope">
           <template v-if="scope.row.isDiscard=='true'">
             <el-button type="primary" plain disabled> 操作
@@ -202,7 +202,7 @@
 // @ts-ignore
 import {Search, ArrowDown} from "@element-plus/icons-vue"
 import {onMounted, reactive, ref, watchEffect} from "vue";
-import {ElLoading} from "element-plus/es";
+import {ElLoading, ElMessageBox} from "element-plus/es";
 import {ElNotification} from "element-plus/es/components/notification/index";
 import {Base64} from 'js-base64';
 /*
@@ -240,6 +240,12 @@ const getDocFileList = async (p: PagingInfo) => {
     let data = res.data as { docFiles: Array<DocFile>, count: number }
     tableData.push(...data.docFiles)
     pageCount.value = Math.ceil(data.count / PAGE_SIZE)
+  }else{
+    await ElMessageBox.alert(res.msg, '提示', {
+      confirmButtonText: '好的',
+      callback: () => {
+      }
+    })
   }
 
 }

@@ -97,7 +97,7 @@ type PagingInfo struct {
 	Search   map[string]string `json:"search,omitempty"`
 }
 
-func GetDocFileListByCondition(paging PagingInfo) (docFiles []DocFile, funcErr error) {
+func GetDocFileListByCondition(paging PagingInfo, userInfo *entity.User) (docFiles []DocFile, funcErr error) {
 
 	defer common.RecoverHandler(func(err error) {
 		funcErr = err
@@ -105,7 +105,7 @@ func GetDocFileListByCondition(paging PagingInfo) (docFiles []DocFile, funcErr e
 	})
 
 	var docFileMapArray = make([]map[string]any, 0)
-	querySql, queryParam := makeSql(paging)
+	querySql, queryParam := makeSql(paging, userInfo)
 	err_Find := conf.Engine.SQL(querySql, queryParam...).Find(&docFileMapArray)
 	fmt.Printf("%+v", err_Find)
 	common.ErrorHandler(err_Find)
@@ -131,8 +131,6 @@ func GetDocFileListByCondition(paging PagingInfo) (docFiles []DocFile, funcErr e
 			common.ErrorHandler(err_updateContentList)
 		}
 
-		fmt.Println(docId, updateContentList)
-
 		docFile.UpdateContentList = updateContentList
 		docFiles = append(docFiles, docFile)
 	}
@@ -141,7 +139,7 @@ func GetDocFileListByCondition(paging PagingInfo) (docFiles []DocFile, funcErr e
 
 }
 
-func makeSql(paging PagingInfo) (query any, args []any) {
+func makeSql(paging PagingInfo, user *entity.User) (query any, args []any) {
 	proId := paging.ProId
 
 	var searchSql string = ""
@@ -207,6 +205,14 @@ func makeSql(paging PagingInfo) (query any, args []any) {
 						WHERE
 							doc.pro_id = ? 
 					`)
+	// 游客的场合
+	if user == nil {
+		sb.WriteString(` AND doc.is_discard = 'false' AND doc.is_release = 'true' `)
+	} else {
+		// 社内用户的场合
+		sb.WriteString(` AND ( (doc.is_discard = 'true' and doc.owner_id = '` + user.PhoneNumber + `') OR doc.is_discard = 'false'  ) `)
+	}
+
 	sb.WriteString(searchSql)
 	sb.WriteString(orderSql)
 	sb.WriteString(limitSql)
@@ -227,7 +233,7 @@ func makeSql(paging PagingInfo) (query any, args []any) {
 	return querySql, queryParam
 }
 
-func GetDocCountByProId(paging PagingInfo) (count int, funcErr error) {
+func GetDocCountByProId(paging PagingInfo, userInfo *entity.User) (count int, funcErr error) {
 
 	defer common.RecoverHandler(func(err error) {
 		funcErr = err
@@ -235,7 +241,7 @@ func GetDocCountByProId(paging PagingInfo) (count int, funcErr error) {
 	})
 	// 清空limit属性，做到全搜索
 	paging.Page = 0
-	querySql, queryParam := makeSql(paging)
+	querySql, queryParam := makeSql(paging, userInfo)
 	var docFileMapArray = make([]map[string]any, 0)
 	err_Count := conf.Engine.SQL(querySql, queryParam...).Find(&docFileMapArray)
 	common.ErrorHandler(err_Count)

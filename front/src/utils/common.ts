@@ -55,4 +55,4 @@ export const downLoadFile = (url: string, name: string) => {
 }
 
 
-export const OBS_URL: string = "https://file-report-store.obs.cn-north-4.myhuaweicloud.com/"
+export const OBS_URL: string = "https://yyk-app-store.obs.cn-north-4.myhuaweicloud.com/resource/"

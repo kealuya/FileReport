@@ -57,7 +57,7 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, onMounted, ref} from "vue";
+import {computed, onBeforeMount, onMounted, ref} from "vue";
 import {
   ElLoading,
   ElMessage,
@@ -74,11 +74,19 @@ import {useUserStore} from "~/stores";
 import {callNewDoc, callUpdateDoc} from "~/utils/doc";
 import {ElMessageBox} from "element-plus/es";
 import {useRoute} from "vue-router";
+import {create} from "domain";
 
-const ak = 'SNZGBWTDEF0IRJKXJGJF';
-const sk = 'W3H3nbgxHU3zDAblqwvTjO18V6X9ZeIexyn7Ter1';
+const ak = 'PY5JGHSUPJ83HQOROPXM';
+const sk = 'ULEIvNhTnMdBsla1260EjSRo1b1GVECgiDzyU6Qr';
 const server = 'obs.cn-north-4.myhuaweicloud.com';
-const bucket = 'file-report-store';
+const bucket = 'yyk-app-store/resource';
+
+
+// const ak = 'SNZGBWTDEF0IRJKXJGJF';
+// const sk = 'W3H3nbgxHU3zDAblqwvTjO18V6X9ZeIexyn7Ter1';
+// const server = 'obs.cn-north-4.myhuaweicloud.com';
+// const bucket = 'file-report-store';
+
 const projectId: string = useRoute().query.projectId as string
 // ==============================================================================
 // 组件 v-modal 模式

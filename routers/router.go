@@ -7,25 +7,47 @@ import (
 	"FileReport/entity"
 	"FileReport/models"
 	"encoding/json"
+	"fmt"
 	"github.com/beego/beego/v2/core/logs"
 	beego "github.com/beego/beego/v2/server/web"
 	"github.com/beego/beego/v2/server/web/context"
+	"strings"
 	"time"
 )
 
 var AuthFilter = func(ctx *context.Context) {
-	println("进拦截器")
+	println("拦截器")
 	token := ctx.Request.Header.Get("token")
-	if token != "" {
-		result := models.UserExist(token)
-		if result {
+	fmt.Println("token:", token)
+	fmt.Println("RequestURI:", ctx.Request.RequestURI)
 
+	if strings.Index(ctx.Request.RequestURI, "getDocFileList") != -1 {
+		resJson := controllers.NewJsonStruct(nil)
+		if token != "" {
+			user, err_GetUserByToken := models.GetUserByToken(token)
+			userValueBytes, _ := json.Marshal(user)
+			if err_GetUserByToken != nil {
+				resJson.Success = false
+				resJson.Msg = err_GetUserByToken.Error()
+				logs.Error(resJson)
+				b, _ := json.Marshal(resJson)
+				_, _ = ctx.ResponseWriter.Write(b)
+			}
+			if user == nil {
+				resJson.Success = false
+				resJson.Msg = "权限不足"
+				b, _ := json.Marshal(resJson)
+				_, _ = ctx.ResponseWriter.Write(b)
+			} else {
+				ctx.Request.Header.Add("user", string(userValueBytes))
+			}
 		} else {
-			ctx.ResponseWriter.Write([]byte("不存在改成员，或改成员已失效"))
+			// getDocFileList 不需要token 也可以处理
+			ctx.Request.Header.Add("user", "")
+			return
 		}
-	} else {
-		ctx.ResponseWriter.Write([]byte("没token"))
 	}
+
 	// 权限验证过滤器内容
 }
 var FilterLog = func(ctx *context.Context) {
@@ -53,9 +75,8 @@ func init() {
 	//beego.InsertFilter("/*", beego.FinishRouter, FilterLog, beego.WithReturnOnOutput(false))
 	namespace :=
 		beego.NewNamespace("/v1",
-
+			beego.NSBefore(AuthFilter), //拦截器，暂时关闭
 			beego.NSNamespace("/file",
-				//beego.NSBefore(AuthFilter), //拦截器，暂时关闭
 				beego.NSRouter("/updateFile", &controllers.FileController{}, "post:UpdateFile"),
 				beego.NSRouter("/uploadFile", &controllers.FileController{}, "post:UploadFile"),
 				beego.NSRouter("/fileAuthority", &controllers.FileController{}, "post:FileAuthority"),

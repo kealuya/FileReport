@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"github.com/beego/beego/v2/core/logs"
 	beego "github.com/beego/beego/v2/server/web"
+	"github.com/beego/beego/v2/server/web/context"
 	"github.com/gohouse/t"
 	"time"
 )
@@ -145,6 +146,17 @@ func (uCtrl *DocController) UpdateDoc() {
 	return
 }
 
+func getUserInfo(ctx *context.Context) *entity.User {
+	userString := ctx.Request.Header.Get("user")
+	if userString == "" {
+		return nil
+	}
+	userData := new(entity.User)
+
+	_ = json.Unmarshal([]byte(userString), userData)
+	return userData
+}
+
 func (uCtrl *DocController) GetDocFileList() {
 	resJson := NewJsonStruct(nil)
 	defer func() {
@@ -161,8 +173,8 @@ func (uCtrl *DocController) GetDocFileList() {
 		logs.Error(err_Unmarshal, string(res))
 		return
 	}
-
-	docFiles, err_GetDocFileListByCondition := models.GetDocFileListByCondition(pi)
+	u := getUserInfo(uCtrl.Ctx)
+	docFiles, err_GetDocFileListByCondition := models.GetDocFileListByCondition(pi, u)
 	if err_GetDocFileListByCondition != nil {
 		resJson.Success = false
 		resJson.Msg = fmt.Sprintf("系统错误 : %s", err_GetDocFileListByCondition.Error())
@@ -170,7 +182,7 @@ func (uCtrl *DocController) GetDocFileList() {
 		return
 	}
 
-	count, err_GetDocCountByProId := models.GetDocCountByProId(pi)
+	count, err_GetDocCountByProId := models.GetDocCountByProId(pi, u)
 	if err_GetDocCountByProId != nil {
 		resJson.Success = false
 		resJson.Msg = fmt.Sprintf("系统错误 : %s", err_GetDocCountByProId.Error())

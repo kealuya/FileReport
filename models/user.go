@@ -132,15 +132,20 @@ func UserLoginHandler(phoneNumber string) (user entity.User, funcErr error) {
 
 	return *userData, nil
 }
-func UserExist(token string) (result bool) {
+func GetUserByToken(token string) (user *entity.User, funcErr error) {
 	common.RecoverHandler(func(err error) {
-		result = false
+		user = nil
+		funcErr = err
 		return
 	})
 	userData := new(entity.User)
-	hasData, err_Get := conf.Engine.Where("token=?", token).And("is_disable<>'yes'").Get(userData)
+	has, err_Get := conf.Engine.Where("token=?", token).And("is_disable='no'").Get(userData)
 	common.ErrorHandler(err_Get)
-	return hasData
+	if has {
+		return userData, nil
+	} else {
+		return nil, nil
+	}
 
 }
 
